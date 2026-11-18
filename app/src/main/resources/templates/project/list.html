@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(#{nav.projects})}"></header>
+    <main>
+        <div class="page-head">
+            <div>
+                <div class="eyebrow" th:text="#{project.list.eyebrow}">Configuration</div>
+                <h1 th:text="#{project.list.title}">Projects</h1>
+                <p th:text="#{project.list.subtitle}">Prices, currency and workers for every project.</p>
+            </div>
+            <div class="page-actions">
+                <a id="btn-new-project" class="btn primary" th:href="@{/projects/new}"><svg class="ic"><use href="#i-plus"/></svg><span th:text="#{project.new}">New project</span></a>
+            </div>
+        </div>
+        <section class="card">
+            <div class="toolbar">
+                <label class="search"><span class="sr-only" th:text="#{project.search}">Search</span>
+                    <svg class="ic"><use href="#i-search"/></svg>
+                    <input id="project-search" type="search" th:placeholder="#{project.search}" autocomplete="off">
+                </label>
+                <select id="project-currency" th:aria-label="#{project.currency}">
+                    <option value="" th:text="#{project.filter.anyCurrency}">Any currency</option>
+                    <option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">RUB</option>
+                </select>
+            </div>
+            <div class="table-wrap">
+                <table id="project-table" class="data">
+                    <thead>
+                    <tr>
+                        <th th:text="#{project.name}">Name</th>
+                        <th th:text="#{project.currency}">Currency</th>
+                        <th class="col-hide-sm" th:text="#{project.prices}">Prices</th>
+                        <th class="num" th:text="#{project.workers}">Workers</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="p : ${projects}" th:attr="data-project=${p.name},data-currency=${p.currency}">
+                        <td class="cell-title">
+                            <a th:href="@{/projects/{id}(id=${p.id})}" th:text="${p.system} ? #{project.system} : ${p.name}">Project</a>
+                            <small th:if="${p.system}" th:text="#{project.system.hint}">Built in</small>
+                        </td>
+                        <td><span class="chip" th:text="${p.currency}">RUB</span></td>
+                        <td class="col-hide-sm">
+                            <span class="sub" style="margin:0">
+                                <span th:text="#{material.sand}">Sand</span> <span data-num th:text="${p.sandPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.sandPrice.unit}}">/ m³</span> ·
+                                <span th:text="#{material.stone}">Stone</span> <span data-num th:text="${p.stonePrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.stonePrice.unit}}">/ m³</span> ·
+                                <span th:text="#{material.cement}">Cement</span> <span data-num th:text="${p.cementPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.cementPrice.unit}}">/ bag</span>
+                            </span>
+                        </td>
+                        <td class="num" th:text="${p.system} ? '—' : ${p.workerIds.size()}">0</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty" id="no-project-match" hidden style="padding:36px 20px"><h2 th:text="#{calc.noMatch}">Nothing matches your search</h2></div>
+        </section>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>

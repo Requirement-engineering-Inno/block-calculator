@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('users')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(#{nav.users})}"></header>
+    <main>
+        <div class="page-head">
+            <div>
+                <div class="eyebrow" th:text="#{user.list.eyebrow}">Access</div>
+                <h1 th:text="#{user.list.title}">Users</h1>
+                <p th:text="#{user.list.subtitle}">Create accounts and block those who left.</p>
+            </div>
+        </div>
+        <div class="grid-main wide-left">
+            <section class="card">
+                <form class="toolbar" method="get" th:action="@{/users}">
+                    <label class="search"><span class="sr-only" th:text="#{user.search}">Search</span>
+                        <svg class="ic"><use href="#i-search"/></svg>
+                        <input id="user-search" type="search" name="q" th:value="${q}" th:placeholder="#{user.search}" autocomplete="off">
+                    </label>
+                    <select name="role" th:aria-label="#{user.role}" onchange="this.form.submit()">
+                        <option value="" th:text="#{user.filter.anyRole}">Any role</option>
+                        <option th:each="r : ${filterRoles}" th:value="${r.name()}" th:selected="${r.name() == roleFilter}" th:text="#{${'role.' + r}}">Worker</option>
+                    </select>
+                    <select name="active" th:aria-label="#{user.status}" onchange="this.form.submit()">
+                        <option value="" th:text="#{user.filter.anyStatus}">Any status</option>
+                        <option value="true" th:selected="${activeFilter == 'true'}" th:text="#{user.active}">Active</option>
+                        <option value="false" th:selected="${activeFilter == 'false'}" th:text="#{user.blocked}">Blocked</option>
+                    </select>
+                    <button type="submit" class="btn secondary" th:text="#{user.filter.apply}">Search</button>
+                </form>
+                <div class="table-wrap">
+                    <table id="user-table" class="data">
+                        <thead>
+                        <tr>
+                            <th th:text="#{user.displayName}">Name</th>
+                            <th th:text="#{user.role}">Role</th>
+                            <th th:text="#{user.status}">Status</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="u : ${page.items()}" th:attr="data-user=${u.username},data-active=${u.active}" th:classappend="${u.active} ? '' : 'archived'">
+                            <td class="cell-title">
+                                <span class="person"><span class="avatar" th:text="${#strings.substring(u.displayName, 0, 1)}">A</span>
+                                    <span><a th:href="@{/users/{id}(id=${u.id})}" th:text="${u.displayName}">Name</a> <span class="chip gray" th:if="${u.id == me.id}" th:text="#{user.you}">you</span>
+                                        <small th:text="${u.username}">login</small></span></span>
+                            </td>
+                            <td><span class="chip" th:classappend="${u.role.name() == 'MANAGER'} ? 'blue' : (${u.role.name() == 'ADMIN'} ? 'amber' : 'green')" th:text="#{${'role.' + u.role}}">Role</span></td>
+                            <td><span class="chip" th:classappend="${u.active} ? 'green' : 'gray'" th:text="${u.active} ? #{user.active} : #{user.blocked}">Active</span></td>
+                            <td class="num">
+                                <form class="inline" th:if="${u.role.name() != 'ADMIN' and u.active and u.id != me.id}" th:action="@{/users/{id}/block(id=${u.id})}" method="post">
+                                    <button type="submit" class="btn ghost danger sm"><svg class="ic"><use href="#i-block"/></svg><span th:text="#{user.block}">Block</span></button>
+                                </form>
+                                <form class="inline" th:if="${u.role.name() != 'ADMIN' and !u.active}" th:action="@{/users/{id}/unblock(id=${u.id})}" method="post">
+                                    <button type="submit" class="btn ghost sm"><svg class="ic"><use href="#i-restore"/></svg><span th:text="#{user.unblock}">Unblock</span></button>
+                                </form>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="empty" th:if="${page.items().isEmpty()}" style="padding:36px 20px">
+                    <h2 th:text="#{user.none}">Nobody found</h2>
+                </div>
+                <div class="pager" th:if="${page.pages() > 1}">
+                    <span th:text="#{user.pager(${page.total()}, ${page.page()}, ${page.pages()})}">15 of 40</span>
+                    <span>
+                        <a class="btn secondary sm" th:if="${page.page() > 1}" th:href="@{/users(q=${q},role=${roleFilter},active=${activeFilter},page=${page.page() - 1})}" th:text="#{pager.prev}">Previous</a>
+                        <a class="btn secondary sm" th:if="${page.page() < page.pages()}" th:href="@{/users(q=${q},role=${roleFilter},active=${activeFilter},page=${page.page() + 1})}" th:text="#{pager.next}">Next</a>
+                    </span>
+                </div>
+            </section>
+
+            <section class="card">
+                <div class="card-head"><h2 th:text="#{user.new}">New user</h2></div>
+                <div class="card-body">
+                    <form th:action="@{/users}" method="post">
+                        <div class="field"><label class="lbl" for="nu-username" th:text="#{user.username}">Username</label>
+                            <input id="nu-username" type="text" name="username" required pattern="[A-Za-z0-9._-]{3,40}" autocomplete="off"></div>
+                        <div class="field"><label class="lbl" for="nu-name"><span th:text="#{user.displayName}">Name</span> <span class="opt" th:text="#{common.optional}">(optional)</span></label>
+                            <input id="nu-name" type="text" name="displayName" maxlength="80" autocomplete="off"></div>
+                        <div class="field"><label class="lbl" for="nu-password" th:text="#{login.password}">Password</label>
+                            <input id="nu-password" type="password" name="password" required minlength="6" autocomplete="new-password">
+                            <p class="hint" th:text="#{user.password.hint}">At least 6 characters.</p></div>
+                        <div class="field"><label class="lbl" for="nu-role" th:text="#{user.role}">Role</label>
+                            <select id="nu-role" name="role"><option th:each="r : ${roles}" th:value="${r.name()}" th:text="#{${'role.' + r}}">Worker</option></select></div>
+                        <div class="form-actions"><button id="btn-create-user" type="submit" class="btn primary"><span th:text="#{user.create}">Create</span><svg class="ic"><use href="#i-plus"/></svg></button></div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>

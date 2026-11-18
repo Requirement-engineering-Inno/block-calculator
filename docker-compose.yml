@@ -1,0 +1,21 @@
+# Demo setup: app + MongoDB with demo users and sample data.
+# For a real deployment remove APP_DEMO_ENABLED and set a strong ADMIN_PASSWORD.
+services:
+  mongo:
+    image: mongo:8
+    volumes:
+      - mongo-data:/data/db
+
+  app:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      MONGODB_URI: mongodb://mongo:27017/blockcalc
+      ADMIN_PASSWORD: admin
+      APP_DEMO_ENABLED: "true"
+    depends_on:
+      - mongo
+
+volumes:
+  mongo-data:

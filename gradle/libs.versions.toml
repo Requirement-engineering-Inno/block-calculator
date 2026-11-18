@@ -1,0 +1,13 @@
+[versions]
+openpdf = "2.0.3"
+jsoup = "1.18.3"
+cucumber = "7.20.1"
+mongo-java-server = "1.47.0"
+
+[libraries]
+openpdf = { module = "com.github.librepdf:openpdf", version.ref = "openpdf" }
+jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
+cucumber-java = { module = "io.cucumber:cucumber-java", version.ref = "cucumber" }
+cucumber-spring = { module = "io.cucumber:cucumber-spring", version.ref = "cucumber" }
+cucumber-junit-platform-engine = { module = "io.cucumber:cucumber-junit-platform-engine", version.ref = "cucumber" }
+mongo-java-server = { module = "de.bwaldvogel:mongo-java-server", version.ref = "mongo-java-server" }

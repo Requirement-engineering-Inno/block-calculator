@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<div class="login">
+    <section class="login-hero">
+        <a class="brand" th:href="@{/login}">
+            <img th:src="@{/icon.svg}" alt="">
+            <span><strong th:text="#{app.title}">Block Calculator</strong><small th:text="#{app.tagline}">Production planning</small></span>
+        </a>
+        <h1 th:text="#{login.hero.title}">Every block starts with a plan.</h1>
+        <p th:text="#{login.hero.text}">Calculate cement, stone and sand.</p>
+        <ul>
+            <li><svg class="ic"><use href="#i-check"/></svg><span th:text="#{login.hero.1}">Materials and cost in seconds</span></li>
+            <li><svg class="ic"><use href="#i-check"/></svg><span th:text="#{login.hero.2}">Projects, prices and currencies</span></li>
+            <li><svg class="ic"><use href="#i-check"/></svg><span th:text="#{login.hero.3}">Share estimates with your team</span></li>
+        </ul>
+    </section>
+    <section class="login-panel">
+        <div class="lang login-lang">
+            <a th:each="l : ${languages}" th:href="@{/login(lang=${l})}" th:text="${#strings.toUpperCase(l)}"
+               th:classappend="${#locale.language == l} ? 'on' : ''">EN</a>
+        </div>
+        <div class="login-box">
+            <h2 th:text="#{login.title}">Sign in</h2>
+            <p id="login-error" class="notice error" style="margin-bottom:16px" th:if="${param.error}" th:text="#{login.error}">Wrong username or password</p>
+            <form th:action="@{/login}" method="post">
+                <div class="field">
+                    <label class="lbl" for="username" th:text="#{login.username}">Username</label>
+                    <input id="username" type="text" name="username" required autofocus autocomplete="username">
+                </div>
+                <div class="field">
+                    <label class="lbl" for="password" th:text="#{login.password}">Password</label>
+                    <input id="password" type="password" name="password" required autocomplete="current-password">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn primary"><span th:text="#{login.submit}">Sign in</span><svg class="ic"><use href="#i-arrow"/></svg></button>
+                </div>
+            </form>
+        </div>
+        <div class="demo" th:if="${!demoAccounts.isEmpty()}">
+            <h3 th:text="#{login.demo.title}">Demo accounts</h3>
+            <p th:text="#{login.demo.hint}">Click an account to fill in the form.</p>
+            <button type="button" th:each="a : ${demoAccounts}" th:attr="data-fill-user=${a.username()},data-fill-password=${a.password()}">
+                <span class="avatar sm" th:text="${#strings.substring(a.username(), 0, 1)}">a</span>
+                <strong th:text="${a.name()}">Name</strong>
+                <small th:text="${a.username() + ' / ' + a.password()}">user / pass</small>
+                <span class="chip" th:text="#{${'role.' + a.role()}}">Role</span>
+            </button>
+        </div>
+    </section>
+</div>
+</body>
+</html>

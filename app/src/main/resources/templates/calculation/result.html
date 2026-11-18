@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Estimate card and material breakdown. Used on the calculation page and as the live preview (htmx). Needs model attribute "res". -->
+<div th:fragment="result" class="stack">
+    <section class="estimate">
+        <div class="estimate-top"><h2 th:text="#{calc.estimate}">Production estimate</h2></div>
+        <div class="estimate-label" th:text="#{calc.totalCost}">Total material cost</div>
+        <div class="estimate-total"><span id="res-total" data-num th:text="${res.total().toPlainString()}">0</span><small id="res-currency" th:text="${res.currency()}">RUB</small></div>
+        <div class="estimate-stats">
+            <div><span th:text="#{calc.blocksTotal}">Blocks</span><strong id="res-blocks" data-num th:text="${res.blocks().stripTrailingZeros().toPlainString()}">0</strong></div>
+            <div><span th:text="#{calc.batches}">Batches</span><strong id="res-batches" data-num th:text="${res.batches().stripTrailingZeros().toPlainString()}">0</strong></div>
+            <div><span th:text="#{calc.costPerBlock}">Cost per block</span><strong id="res-cost-per-block" data-num th:text="${res.costPerBlock().toPlainString()}">0</strong></div>
+        </div>
+    </section>
+    <section class="card breakdown">
+        <div class="card-head"><h2 th:text="#{calc.breakdown}">Material breakdown</h2></div>
+        <div class="card-body table-wrap">
+            <table>
+                <thead><tr>
+                    <th th:text="#{calc.material}">Material</th>
+                    <th th:text="#{calc.quantity}">Quantity</th>
+                    <th class="num"><span th:text="#{calc.cost}">Cost</span>, <span th:text="${res.currency()}">RUB</span></th>
+                </tr></thead>
+                <tbody>
+                <tr>
+                    <td><span class="dot"></span><strong th:text="#{material.sand}">Sand</strong></td>
+                    <td><strong><span id="res-sand-kg" data-num th:text="${res.sandKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
+                        <span class="sub"><span id="res-sand-barrows" data-num th:text="${res.sandBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
+                    <td class="num"><strong id="res-sand-cost" data-num th:text="${res.sandCost().toPlainString()}">0</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="dot stone"></span><strong th:text="#{material.stone}">Stone</strong></td>
+                    <td><strong><span id="res-stone-kg" data-num th:text="${res.stoneKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
+                        <span class="sub"><span id="res-stone-barrows" data-num th:text="${res.stoneBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
+                    <td class="num"><strong id="res-stone-cost" data-num th:text="${res.stoneCost().toPlainString()}">0</strong></td>
+                </tr>
+                <tr>
+                    <td><span class="dot cement"></span><strong th:text="#{material.cement}">Cement</strong></td>
+                    <td><strong><span id="res-cement-kg" data-num th:text="${res.cementKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
+                        <span class="sub"><span id="res-cement-bags" data-num th:text="${res.cementBags().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.bags}">bags of 50 kg</span></span></td>
+                    <td class="num"><strong id="res-cement-cost" data-num th:text="${res.cementCost().toPlainString()}">0</strong></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="note"><span th:text="#{calc.wsNote}">Wheelbarrow weight</span>: <span id="res-ws" data-num th:text="${res.ws().stripTrailingZeros().toPlainString()}">150</span> <span th:text="#{unit.kg}">kg</span>.
+                <span th:text="#{calc.excludes}">Estimates exclude labour, water, delivery and tax.</span></p>
+        </div>
+    </section>
+</div>
+<div th:fragment="previewError" class="notice error" th:text="${previewMessage}">Invalid input</div>
+</body>
+</html>

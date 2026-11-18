@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(${isNew} ? #{project.new} : #{project.settings})}"></header>
+    <main>
+        <div class="page-head">
+            <div>
+                <div class="eyebrow"><a th:href="@{/projects}" th:text="#{project.back}">All projects</a></div>
+                <h1 th:text="${isNew} ? #{project.new} : (${p.system} ? #{project.system} : ${p.name})">Project</h1>
+                <p th:if="${p.system}" th:text="#{project.system.hint}">Built in</p>
+            </div>
+        </div>
+
+        <div class="grid-main wide-left">
+            <form th:action="${isNew} ? @{/projects} : @{/projects/{id}(id=${p.id})}" method="post" class="stack">
+                <section class="card">
+                    <div class="card-head"><h2 th:text="#{project.section.general}">General</h2></div>
+                    <div class="card-body">
+                        <div class="field" th:unless="${p.system}">
+                            <label class="lbl" for="name" th:text="#{project.name}">Name</label>
+                            <input id="name" type="text" name="name" th:value="${p.name}" maxlength="100" required>
+                        </div>
+                        <div class="row2">
+                            <div class="field">
+                                <label class="lbl" for="currency" th:text="#{project.currency}">Currency</label>
+                                <input id="currency" type="text" name="currency" th:value="${p.currency}" required maxlength="8">
+                            </div>
+                            <div class="field">
+                                <label class="lbl" for="ws" th:text="#{project.ws}">Default WS</label>
+                                <div class="input-group"><input id="ws" type="number" name="ws" min="1" max="10000" step="any" th:value="${p.wsDefault.toPlainString()}" required><span class="suffix" th:text="#{unit.kg}">kg</span></div>
+                            </div>
+                        </div>
+                        <p class="hint" style="margin:-6px 0 18px" th:text="#{project.ws.hint}">Weight of one wheelbarrow of sand or stone.</p>
+                        <div class="row2">
+                            <div class="field">
+                                <label class="lbl" for="sandDensity" th:text="#{project.sandDensity}">Sand density</label>
+                                <div class="input-group"><input id="sandDensity" type="number" name="sandDensity" min="1" max="10000" step="any" th:value="${p.sandDensity.toPlainString()}" required><span class="suffix">kg/m³</span></div>
+                            </div>
+                            <div class="field">
+                                <label class="lbl" for="stoneDensity" th:text="#{project.stoneDensity}">Stone density</label>
+                                <div class="input-group"><input id="stoneDensity" type="number" name="stoneDensity" min="1" max="10000" step="any" th:value="${p.stoneDensity.toPlainString()}" required><span class="suffix">kg/m³</span></div>
+                            </div>
+                        </div>
+                        <p class="hint" th:text="#{project.density.hint}">Densities convert prices per m³ into prices per kg.</p>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-head"><h2 th:text="#{project.section.prices}">Material prices</h2><span class="step" th:text="#{project.price.max(${1000000})}">Up to 1,000,000</span></div>
+                    <div class="card-body">
+                        <div class="price-row">
+                            <span class="name"><span class="dot"></span><span th:text="#{material.sand}">Sand</span></span>
+                            <div class="input-group">
+                                <input type="number" name="sandAmount" min="0" max="1000000" step="any" th:value="${p.sandPrice.amount.toPlainString()}" required th:aria-label="#{material.sand}">
+                                <select name="sandUnit" th:aria-label="#{material.sand}"><option th:each="u : ${areaUnits}" th:value="${u.name()}" th:selected="${u == p.sandPrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
+                            </div>
+                        </div>
+                        <div class="price-row">
+                            <span class="name"><span class="dot stone"></span><span th:text="#{material.stone}">Stone</span></span>
+                            <div class="input-group">
+                                <input type="number" name="stoneAmount" min="0" max="1000000" step="any" th:value="${p.stonePrice.amount.toPlainString()}" required th:aria-label="#{material.stone}">
+                                <select name="stoneUnit" th:aria-label="#{material.stone}"><option th:each="u : ${areaUnits}" th:value="${u.name()}" th:selected="${u == p.stonePrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
+                            </div>
+                        </div>
+                        <div class="price-row">
+                            <span class="name"><span class="dot cement"></span><span th:text="#{material.cement}">Cement</span></span>
+                            <div class="input-group">
+                                <input type="number" name="cementAmount" min="0" max="1000000" step="any" th:value="${p.cementPrice.amount.toPlainString()}" required th:aria-label="#{material.cement}">
+                                <select name="cementUnit" th:aria-label="#{material.cement}"><option th:each="u : ${cementUnits}" th:value="${u.name()}" th:selected="${u == p.cementPrice.unit}" th:text="#{${'unit.' + u.name()}}">per bag</option></select>
+                            </div>
+                        </div>
+                        <p class="hint" th:text="#{project.prices.hint}">Prices are in the project currency.</p>
+                    </div>
+                </section>
+
+                <section class="card" th:unless="${p.system}">
+                    <div class="card-head"><h2 th:text="#{project.section.workers}">Workers</h2></div>
+                    <div class="card-body">
+                        <p class="hint" style="margin:0 0 14px" th:text="#{project.workers.hint}">Only assigned workers can create calculations here.</p>
+                        <div class="picker" data-picker data-mode="multi" data-field="workerIds" th:attr="data-url=@{/directory/workers}">
+                            <div class="picker-count"><strong data-count th:text="${selectedWorkers.size()}">0</strong> <span th:text="#{picker.selected}">selected</span></div>
+                            <div class="picker-selected">
+                                <span class="chip-person" th:each="w : ${selectedWorkers}" th:attr="data-id=${w.id}">
+                                    <span class="avatar sm" th:text="${#strings.substring(w.displayName, 0, 1)}">W</span>
+                                    <span th:text="${w.displayName}">Worker</span>
+                                    <button type="button" class="btn-icon" data-remove th:aria-label="#{common.remove}"><svg class="ic"><use href="#i-x"/></svg></button>
+                                    <input type="hidden" name="workerIds" th:value="${w.id}">
+                                </span>
+                            </div>
+                            <label class="search"><span class="sr-only" th:text="#{picker.search}">Search workers</span>
+                                <svg class="ic"><use href="#i-search"/></svg>
+                                <input class="picker-input" type="search" th:placeholder="#{picker.search}" autocomplete="off">
+                            </label>
+                            <div class="picker-results" hidden></div>
+                        </div>
+                    </div>
+                </section>
+
+                <div class="form-actions" style="margin:0">
+                    <a class="btn ghost" th:href="@{/projects}" th:text="#{common.cancel}">Cancel</a>
+                    <button id="btn-save-project" type="submit" class="btn primary"><span th:text="#{common.save}">Save</span><svg class="ic"><use href="#i-check"/></svg></button>
+                </div>
+            </form>
+
+            <section class="card" th:unless="${isNew}">
+                <div class="card-head"><h2 th:text="#{project.currency.change}">Change currency</h2></div>
+                <div class="card-body">
+                    <p class="hint" style="margin:0 0 16px" th:text="#{project.currency.hint}">All prices are multiplied by the rate.</p>
+                    <form th:action="@{/projects/{id}/currency(id=${p.id})}" method="post">
+                        <div class="row2">
+                            <div class="field"><label class="lbl" for="newCurrency" th:text="#{project.currency.new}">New currency</label>
+                                <input id="newCurrency" type="text" name="currency" required maxlength="8"></div>
+                            <div class="field"><label class="lbl" for="rate" th:text="#{project.rate}">Rate</label>
+                                <input id="rate" type="number" name="rate" min="0.000001" max="1000000" step="any" required></div>
+                        </div>
+                        <button type="submit" class="btn secondary" th:text="#{project.currency.apply}">Convert</button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>

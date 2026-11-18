@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(#{account.title})}"></header>
+    <main>
+        <div class="page-head"><div>
+            <div class="eyebrow" th:text="${p.username()}">login</div>
+            <h1 th:text="#{account.title}">My account</h1>
+            <p th:text="#{account.subtitle}">Your profile and security settings.</p>
+        </div></div>
+        <div class="grid-main wide-left">
+            <div th:replace="~{user/profile-body :: body}"></div>
+            <section class="card" id="password-card">
+                <div class="card-head"><h2 th:text="#{account.password.title}">Change password</h2><svg class="ic" style="color:#8a9586"><use href="#i-key"/></svg></div>
+                <div class="card-body">
+                    <p id="password-changed" class="notice" style="margin-bottom:18px" th:if="${param.changed}" th:text="#{account.password.changed}">Password changed</p>
+                    <form th:action="@{/account/password}" method="post">
+                        <div class="field"><label class="lbl" for="current" th:text="#{account.password.current}">Current password</label>
+                            <input id="current" type="password" name="current" required autocomplete="current-password"></div>
+                        <div class="field"><label class="lbl" for="new" th:text="#{account.password.new}">New password</label>
+                            <input id="new" type="password" name="new" required minlength="6" autocomplete="new-password">
+                            <p class="hint" th:text="#{user.password.hint}">At least 6 characters.</p></div>
+                        <div class="form-actions"><button type="submit" class="btn primary"><span th:text="#{common.save}">Save</span><svg class="ic"><use href="#i-check"/></svg></button></div>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>

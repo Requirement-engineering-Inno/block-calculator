@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Search results for the worker pickers. Rendered as a fragment, never as a page. -->
+<div th:fragment="workers">
+    <button type="button" class="pick" data-pick th:each="u : ${results}"
+            th:attr="data-id=${u.id},data-name=${u.displayName},data-username=${u.username}">
+        <span class="avatar sm" th:text="${#strings.substring(u.displayName, 0, 1)}">A</span>
+        <strong th:text="${u.displayName}">Name</strong>
+        <small th:text="${u.username}">login</small>
+    </button>
+    <p class="hint" style="padding:10px 12px;margin:0" th:if="${results.isEmpty()}" th:text="#{picker.none}">Nobody found.</p>
+</div>
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('calcs')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(#{nav.calculations})}"></header>
+    <main>
+        <div class="page-head">
+            <div>
+                <div class="eyebrow" th:text="#{calc.list.eyebrow}">Your estimates</div>
+                <h1 th:text="#{calc.list.title}">Calculations</h1>
+                <p th:text="#{calc.list.subtitle}">All estimates you can access.</p>
+            </div>
+            <div class="page-actions">
+                <a id="btn-new" class="btn primary" th:text="#{calc.new}"
+                   th:href="${projectId != ''} ? @{/calculations/new(projectId=${projectId})} : @{/calculations/new}">New calculation</a>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><span th:text="#{calc.stat.total}">Total</span><strong th:text="${rows.size()}">0</strong></div>
+            <div class="stat"><span th:text="#{calc.stat.active}">Active</span><strong th:text="${countActive}">0</strong></div>
+            <div class="stat"><span th:text="#{calc.stat.frozen}">Frozen</span><strong th:text="${countFrozen}">0</strong></div>
+            <div class="stat"><span th:text="#{calc.stat.archived}">Archived</span><strong th:text="${countArchived}">0</strong></div>
+        </div>
+
+        <section class="card">
+            <div class="toolbar">
+                <label class="search"><span class="sr-only" th:text="#{calc.search}">Search</span>
+                    <svg class="ic"><use href="#i-search"/></svg>
+                    <input id="calc-search" type="search" th:placeholder="#{calc.search}" autocomplete="off">
+                </label>
+                <form class="filter-form" method="get" th:action="@{/calculations}">
+                    <label class="sr-only" for="projectFilter" th:text="#{calc.project}">Project</label>
+                    <select id="projectFilter" name="projectId" onchange="this.form.submit()">
+                        <option value="" th:text="#{calc.allProjects}">All projects</option>
+                        <option th:each="p : ${projects}" th:value="${p.id}" th:selected="${p.id == projectId}"
+                                th:text="${p.system} ? #{project.system} : ${p.name}">Project</option>
+                    </select>
+                </form>
+                <div class="segments" role="group">
+                    <button type="button" class="on" data-filter="all" th:text="#{calc.filter.all}">All</button>
+                    <button type="button" data-filter="active" th:text="#{calc.filter.active}">Active</button>
+                    <button type="button" data-filter="frozen" th:text="#{calc.filter.frozen}">Frozen</button>
+                    <button type="button" data-filter="archived" th:text="#{calc.filter.archived}">Archived</button>
+                </div>
+            </div>
+
+            <div class="table-wrap" th:if="${!rows.isEmpty()}">
+                <table id="calc-table" class="data">
+                    <thead>
+                    <tr>
+                        <th th:text="#{calc.title}">Title</th>
+                        <th class="col-hide-sm" th:text="#{calc.author}">Author</th>
+                        <th class="col-hide-sm" th:text="#{calc.updated}">Updated</th>
+                        <th class="num" th:text="#{calc.total}">Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="r : ${rows}" th:classappend="${r.archived()} ? 'archived' : ''"
+                        th:attr="data-calc-title=${r.title()},data-archived=${r.archived()},data-frozen=${r.frozen()}">
+                        <td class="cell-title">
+                            <a th:href="@{/calculations/{id}(id=${r.id()})}" th:text="${r.title()}">Walls</a>
+                            <span class="badge frozen" th:if="${r.frozen()}"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.frozen}">Frozen</span></span>
+                            <span class="badge archived" th:if="${r.archived()}"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archived}">Archived</span></span>
+                            <small th:text="${r.projectSystem()} ? #{project.system} : ${r.project()}">Project</small>
+                        </td>
+                        <td class="col-hide-sm"><span class="person"><span class="avatar sm" th:text="${#strings.substring(r.author(), 0, 1)}">A</span><span th:text="${r.author()}">Author</span></span></td>
+                        <td class="col-hide-sm"><time th:datetime="${r.updatedAt()}" th:text="${@times.gmt(r.updatedAt())}">2026-11-17 10:00 GMT</time></td>
+                        <td class="num"><strong data-num th:text="${r.total()}">0</strong> <span class="sub" style="display:inline" th:text="${r.currency()}">RUB</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty" id="no-match" hidden>
+                <svg class="ic"><use href="#i-search"/></svg>
+                <h2 th:text="#{calc.noMatch}">Nothing matches your search</h2>
+            </div>
+            <div class="empty" th:if="${rows.isEmpty()}">
+                <svg class="ic"><use href="#i-calc"/></svg>
+                <h2 th:text="#{calc.empty.title}">No calculations yet</h2>
+                <p th:text="#{calc.empty.text}">Create your first estimate in a minute.</p>
+                <a class="btn primary" th:href="@{/calculations/new}" th:text="#{calc.new}">New calculation</a>
+            </div>
+        </section>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>
