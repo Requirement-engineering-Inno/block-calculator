@@ -81,7 +81,29 @@
                     </div>
                 </section>
 
-                <div>
+                <div class="stack">
+                    <section class="card" id="mix-compare">
+                        <div class="card-head"><h2 th:text="#{calc.mixes.title}">Mixes compared</h2></div>
+                        <div class="card-body">
+                            <div class="mix-legend">
+                                <span><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><span th:text="#{material.sand}">Sand</span></span>
+                                <span><img class="mat-ico" th:src="@{/img/stone.svg}" alt=""><span th:text="#{material.stone}">Stone</span></span>
+                                <span><img class="mat-ico" th:src="@{/img/cement.svg}" alt=""><span th:text="#{material.cement}">Cement</span></span>
+                            </div>
+                            <button type="button" class="mix-row" th:each="m : ${mixes}" th:attr="data-mix-pick=${m.number}"
+                                    th:classappend="${m.number == f.batch()} ? 'active' : ''">
+                                <span class="mix-name"><strong th:text="#{calc.batch.short(${m.number})}">Mix 4</strong><small th:text="#{calc.mpa(${m.mpa})}">7.6 MPa</small></span>
+                                <span class="mix-bar">
+                                    <span class="seg sand" th:style="|flex-grow:${m.sandBarrows}|" th:text="${m.sandBarrows.stripTrailingZeros().toPlainString()}">2</span>
+                                    <span class="seg stone" th:if="${m.stoneBarrows.signum() > 0}" th:style="|flex-grow:${m.stoneBarrows}|" th:text="${m.stoneBarrows.stripTrailingZeros().toPlainString()}">2</span>
+                                    <span class="seg cement" style="flex-grow:1">1</span>
+                                </span>
+                                <span class="mix-yield"><strong th:text="${m.yield}">28</strong><small th:text="#{calc.mix.blocks}">blocks</small></span>
+                                <span class="mix-strength"><i th:style="|width:${m.mpa.doubleValue() * 100 / 7.6}%|"></i></span>
+                            </button>
+                            <p class="hint" th:text="#{calc.mixes.hint}">Parts per batch.</p>
+                        </div>
+                    </section>
                     <!-- htmx: every change in the form is posted to /calculations/preview and the estimate is swapped in -->
                     <div id="preview" th:attr="hx-post=@{/calculations/preview}" hx-trigger="load, input delay:250ms, change" hx-target="this" hx-swap="innerHTML"
                          hx-include="closest form"></div>

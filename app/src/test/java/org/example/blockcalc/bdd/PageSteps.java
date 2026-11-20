@@ -228,6 +228,18 @@ public class PageSteps {
         assertTrue(offeredProjects().contains(name), "Offered projects: " + offeredProjects());
     }
 
+    @Then("the new calculation form compares {int} mixes")
+    public void formComparesMixes(int expected) throws Exception {
+        assertEquals(expected, world.document().select("#mix-compare .mix-row").size());
+    }
+
+    @Then("mix {int} is highlighted in the comparison")
+    public void mixHighlighted(int number) throws Exception {
+        assertEquals(1, world.document().select("#mix-compare .mix-row.active").size());
+        assertFalse(world.document().select("#mix-compare .mix-row.active[data-mix-pick=\"" + number + "\"]").isEmpty(),
+                "Mix " + number + " is not highlighted");
+    }
+
     @Then("the new calculation form does not offer project {string}")
     public void formDoesNotOffer(String name) throws Exception {
         assertFalse(offeredProjects().contains(name), "Offered projects: " + offeredProjects());

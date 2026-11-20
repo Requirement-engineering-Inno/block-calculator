@@ -115,3 +115,16 @@ Feature: Calculate materials and cost
       | title | project | full | half | batch | ws     |
       | Walls | Alpha   | 100  | 0    | 4     | 100000 |
     Then I see an error message
+
+  Scenario: The form compares all four mixes next to the inputs
+    When I open the new calculation form
+    Then the new calculation form compares 4 mixes
+    And mix 4 is highlighted in the comparison
+
+  Scenario: The preview of an empty form shows neither an estimate nor an error
+    When I preview a calculation:
+      | project |
+      | Alpha   |
+    Then the response status is 200
+    And the page does not contain "at least one block"
+    And the page does not contain "Production estimate"

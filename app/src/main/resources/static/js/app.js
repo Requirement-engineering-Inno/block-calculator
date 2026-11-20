@@ -104,9 +104,22 @@
   }
 
   // Calculation form: show the recipe of the selected batch
+  function showMix(value) {
+    document.querySelectorAll('.mix-hint').forEach(function (p) { p.hidden = p.getAttribute('data-mix') !== value; });
+    document.querySelectorAll('[data-mix-pick]').forEach(function (row) {
+      row.classList.toggle('active', row.getAttribute('data-mix-pick') === value);
+    });
+  }
   document.querySelectorAll('input[name=batch]').forEach(function (radio) {
-    radio.addEventListener('change', function () {
-      document.querySelectorAll('.mix-hint').forEach(function (p) { p.hidden = p.getAttribute('data-mix') !== radio.value; });
+    radio.addEventListener('change', function () { if (radio.checked) showMix(radio.value); });
+  });
+  // Clicking a mix in the comparison selects it in the form (and refreshes the estimate)
+  document.querySelectorAll('[data-mix-pick]').forEach(function (row) {
+    row.addEventListener('click', function () {
+      var radio = document.querySelector('input[name=batch][value="' + row.getAttribute('data-mix-pick') + '"]');
+      if (!radio) return;
+      radio.checked = true;
+      radio.dispatchEvent(new Event('change', { bubbles: true }));
     });
   });
 

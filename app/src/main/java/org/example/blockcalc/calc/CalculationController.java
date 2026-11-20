@@ -103,6 +103,10 @@ public class CalculationController {
             model.addAttribute("res", calcs.preview(me, in));
             return "calculation/result :: result";
         } catch (BusinessException e) {
+            if ("error.calc.blocks".equals(e.getMessageKey())) {
+                // Nothing entered yet: show no estimate and no message
+                return "calculation/result :: previewEmpty";
+            }
             model.addAttribute("previewMessage", messages.getMessage(e.getMessageKey(), e.getArgs(), e.getMessageKey(), locale));
             return "calculation/result :: previewError";
         }

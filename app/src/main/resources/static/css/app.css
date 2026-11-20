@@ -97,7 +97,7 @@ h1 { font-size: clamp(26px, 2.6vw, 34px); line-height: 1.15; letter-spacing: -.8
 .field:last-child { margin-bottom: 0; }
 label.lbl, .lbl { display: block; font-size: 13px; font-weight: 650; margin-bottom: 7px; }
 .lbl .opt { color: #8a9586; font-weight: 400; }
-input[type=text], input[type=number], input[type=password], input[type=search], select {
+input[type=text], input[type=number], input[type=password], input[type=search], input[type=email], input[type=tel], input[type=url], select {
   width: 100%; min-width: 0; height: 44px; padding: 0 13px; background: #fff; border: 1px solid var(--line-2); border-radius: 8px; transition: border-color .15s, box-shadow .15s; }
 select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' fill='none' stroke='%23758078' stroke-width='1.8' stroke-linecap='round'%3E%3Cpath d='M1 1.5l5 5 5-5'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 13px center; padding-right: 34px; }
@@ -375,3 +375,26 @@ body.nav-open::after { content: ""; position: fixed; inset: 0; background: #0b1a
   .action-bar .btn { flex: 1 1 auto; }
   .toast { bottom: 12px; width: calc(100vw - 24px); max-width: none; }
 }
+
+/* ---------- mixes compared (right of the calculation form) ---------- */
+.mix-legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 13px; color: var(--muted); margin-bottom: 14px; }
+.mix-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.mix-legend .mat-ico { width: 22px; height: 22px; }
+.mix-row { display: grid; grid-template-columns: 86px minmax(0, 1fr) 70px; gap: 14px; align-items: center; width: 100%; text-align: left;
+  padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--line-2); border-radius: 10px; background: #fff; transition: all .15s; }
+.mix-row:last-of-type { margin-bottom: 0; }
+.mix-row:hover { border-color: #98ac9e; }
+.mix-row.active { border-color: var(--green-3); background: var(--soft-2); box-shadow: inset 0 0 0 1px var(--green-3); }
+.mix-name strong { display: block; font-size: 15px; }
+.mix-name small { color: var(--muted); font-size: 12px; }
+.mix-bar { display: flex; height: 26px; border-radius: 6px; overflow: hidden; gap: 2px; min-width: 0; }
+.mix-bar .seg { display: grid; place-items: center; font-size: 12px; font-weight: 700; min-width: 0; color: #fff; }
+.seg.sand { background: #c9ae6c; }
+.seg.stone { background: #80998a; }
+.seg.cement { background: var(--green); color: var(--lime); }
+.mix-strength { grid-column: 2; height: 5px; border-radius: 3px; background: #e6eadf; margin-top: -6px; }
+.mix-strength i { display: block; height: 100%; border-radius: 3px; background: var(--green-3); }
+.mix-yield { text-align: right; }
+.mix-yield strong { display: block; font-size: 18px; }
+.mix-yield small { color: var(--muted); font-size: 12px; }
+@media (max-width: 560px) { .mix-row { grid-template-columns: 70px minmax(0, 1fr) 56px; gap: 10px; padding: 10px; } }

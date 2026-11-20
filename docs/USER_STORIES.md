@@ -34,7 +34,7 @@ Report: `app/build/reports/cucumber.html`.
 | US-03      | Changing your own password                 | 1 | 4 |
 | US-04      | Projects and their settings                | 1 | 9 |
 | US-05      | Assigning workers to projects              | 1 | 9 |
-| US-06      | Material and cost calculation              | 1 | 12 |
+| US-06      | Material and cost calculation              | 1 | 14 |
 | US-07      | Prices in kg/m³/tonnes/bags and project currency | 2 | 12 |
 | US-08      | Saving and listing calculations            | 1 | 8 |
 | US-09      | Calculation access                         | 1 | 11 |
@@ -49,7 +49,7 @@ Report: `app/build/reports/cucumber.html`.
 | US-18      | Employee profiles and "My Account"         | 1 | 11 |
 | US-19      | Application settings (wheelbarrow, currencies) | 1 | 12 |
 | US-20      | Welcome e-mail for new employees           | 1 | 6 |
-|            | **Total**                                  | | **174** |
+|            | **Total**                                  | | **176** |
 
 ## US-01. Login and Logout
 
@@ -165,6 +165,8 @@ As a worker, I want to enter the number of full and half blocks (up to 10,000,00
 - [ ] A huge number of blocks is rejected
 - [ ] More blocks than the limit are rejected
 - [ ] A huge WS is rejected
+- [ ] The form compares all four mixes next to the inputs
+- [ ] The preview of an empty form shows neither an estimate nor an error
 
 ## US-07. Prices in kg, m³, Tonnes or Bags and Project Currency
 
@@ -376,8 +378,6 @@ As a manager, I want a new employee to receive an e-mail with the login, passwor
 ## Assumptions to Confirm with the Customer
 
 - Workers can create calculations in "Other calculations" and only see their own calculations and those shared with them.
-- Densities are fixed: sand 1600 kg/m³, crushed stone 1450 kg/m³; a cement bag weighs 50 kg; a tonne is 1000 kg.
-- The wheelbarrow weight (WS) is global and is the same for sand and crushed stone; a calculation can override it.
-- Currencies are global and managed by managers and admins; a currency that a project uses cannot be removed.
+- Default densities: sand 1600 kg/m³, crushed stone 1450 kg/m³; cement bag weight: 50 kg.
+- WS (wheelbarrow weight) is the same for sand and crushed stone.
 - Only a manager or admin can freeze and unfreeze a calculation. A frozen calculation cannot be edited.
-- The welcome e-mail contains the password in plain text, as requested. Employees should change it after the first sign-in.
