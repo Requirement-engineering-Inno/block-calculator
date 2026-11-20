@@ -24,19 +24,19 @@
                 </tr></thead>
                 <tbody>
                 <tr>
-                    <td><span class="dot"></span><strong th:text="#{material.sand}">Sand</strong></td>
+                    <td><span class="mat"><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><strong th:text="#{material.sand}">Sand</strong></span></td>
                     <td><strong><span id="res-sand-kg" data-num th:text="${res.sandKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-sand-barrows" data-num th:text="${res.sandBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
                     <td class="num"><strong id="res-sand-cost" data-num th:text="${res.sandCost().toPlainString()}">0</strong></td>
                 </tr>
                 <tr>
-                    <td><span class="dot stone"></span><strong th:text="#{material.stone}">Stone</strong></td>
+                    <td><span class="mat"><img class="mat-ico" th:src="@{/img/stone.svg}" alt=""><strong th:text="#{material.stone}">Stone</strong></span></td>
                     <td><strong><span id="res-stone-kg" data-num th:text="${res.stoneKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-stone-barrows" data-num th:text="${res.stoneBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
                     <td class="num"><strong id="res-stone-cost" data-num th:text="${res.stoneCost().toPlainString()}">0</strong></td>
                 </tr>
                 <tr>
-                    <td><span class="dot cement"></span><strong th:text="#{material.cement}">Cement</strong></td>
+                    <td><span class="mat"><img class="mat-ico" th:src="@{/img/cement.svg}" alt=""><strong th:text="#{material.cement}">Cement</strong></span></td>
                     <td><strong><span id="res-cement-kg" data-num th:text="${res.cementKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-cement-bags" data-num th:text="${res.cementBags().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.bags}">bags of 50 kg</span></span></td>
                     <td class="num"><strong id="res-cement-cost" data-num th:text="${res.cementCost().toPlainString()}">0</strong></td>

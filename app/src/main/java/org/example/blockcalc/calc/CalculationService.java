@@ -10,6 +10,7 @@ import org.example.blockcalc.common.Limits;
 import org.example.blockcalc.common.Times;
 import org.example.blockcalc.project.Project;
 import org.example.blockcalc.project.ProjectService;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.Role;
 import org.example.blockcalc.user.UserAccount;
 import org.example.blockcalc.user.UserService;
@@ -33,11 +34,13 @@ public class CalculationService {
     private final CalculationRepository repo;
     private final ProjectService projects;
     private final UserService users;
+    private final SettingsService settings;
 
-    public CalculationService(CalculationRepository repo, ProjectService projects, UserService users) {
+    public CalculationService(CalculationRepository repo, ProjectService projects, UserService users, SettingsService settings) {
         this.repo = repo;
         this.projects = projects;
         this.users = users;
+        this.settings = settings;
     }
 
     // ---- create / update ----------------------------------------------------------------
@@ -89,7 +92,7 @@ public class CalculationService {
             throw new BusinessException("error.calc.blocks", Limits.MAX_BLOCKS);
         }
         Mix mix = Mix.of(in.batch() == null ? 0 : in.batch());
-        BigDecimal ws = in.ws() == null ? p.wsDefault : in.ws();
+        BigDecimal ws = in.ws() == null ? settings.wheelbarrowKg() : in.ws();
         if (ws.signum() <= 0 || ws.compareTo(BigDecimal.valueOf(Limits.MAX_WS)) > 0) {
             throw new BusinessException("error.calc.ws", Limits.MAX_WS);
         }

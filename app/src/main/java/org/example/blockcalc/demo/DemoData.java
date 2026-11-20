@@ -11,6 +11,7 @@ import org.example.blockcalc.project.PriceUnit;
 import org.example.blockcalc.project.Project;
 import org.example.blockcalc.project.ProjectRepository;
 import org.example.blockcalc.project.ProjectService;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.Role;
 import org.example.blockcalc.user.UserAccount;
 import org.example.blockcalc.user.UserRepository;
@@ -58,9 +59,11 @@ public class DemoData implements ApplicationRunner {
     private final ProjectRepository projects;
     private final ProjectService projectService;
     private final CalculationRepository calcs;
+    private final SettingsService settings;
 
     public DemoData(Bootstrap bootstrap, UserRepository users, UserService userService, ProjectRepository projects,
-                    ProjectService projectService, CalculationRepository calcs) {
+                    ProjectService projectService, CalculationRepository calcs, SettingsService settings) {
+        this.settings = settings;
         this.bootstrap = bootstrap;
         this.users = users;
         this.userService = userService;
@@ -75,6 +78,7 @@ public class DemoData implements ApplicationRunner {
         if (users.existsByUsername("elena")) {
             return;
         }
+        settings.addCurrencyUnchecked("ZAR");
         UserAccount elena = account("elena", "Elena Petrova", Role.MANAGER);
         account("marcus", "Marcus Weber", Role.MANAGER);
         UserAccount ivan = account("ivan", "Ivan Sokolov", Role.WORKER);
@@ -102,7 +106,7 @@ public class DemoData implements ApplicationRunner {
     }
 
     private UserAccount account(String username, String name, Role role) {
-        return userService.createUnchecked(username, PASSWORD, name, role, null);
+        return userService.createUnchecked(username, PASSWORD, name, role, null, username + "@demo.blockcalc.local");
     }
 
     private Project project(String name, String currency, String sand, String stone, String cement, UserAccount... workers) {

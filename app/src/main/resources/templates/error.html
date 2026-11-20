@@ -8,6 +8,7 @@
     <header th:replace="~{fragments :: topbar(#{error.title})}"></header>
     <main>
         <div class="err-page card card-body">
+            <img class="empty-art" th:src="@{/img/block.svg}" alt="">
             <div class="code" th:text="${status != null} ? ${status} : '!'">!</div>
             <h2 th:text="#{error.title}">Error</h2>
             <p id="error-message" th:text="${errorMessage != null ? errorMessage : (status == 403 ? #messages.msg('error.403') : (status == 404 ? #messages.msg('error.404') : #messages.msg('error.generic')))}">Something went wrong</p>

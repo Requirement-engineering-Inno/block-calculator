@@ -8,6 +8,7 @@ import org.example.blockcalc.project.PriceEntry;
 import org.example.blockcalc.project.PriceUnit;
 import org.example.blockcalc.project.Project;
 import org.example.blockcalc.project.ProjectRepository;
+import org.example.blockcalc.settings.SettingsRepository;
 import org.example.blockcalc.user.Role;
 import org.example.blockcalc.user.UserAccount;
 import org.example.blockcalc.user.UserRepository;
@@ -32,12 +33,15 @@ public class TestData {
     private UserService userService;
     @Autowired
     private Bootstrap bootstrap;
+    @Autowired
+    private SettingsRepository settingsRepo;
 
     /** Empty database plus the default admin and the "Other calculations" project. */
     public void reset() {
         calcs.deleteAll();
         projects.deleteAll();
         users.deleteAll();
+        settingsRepo.deleteAll();
         bootstrap.init();
     }
 

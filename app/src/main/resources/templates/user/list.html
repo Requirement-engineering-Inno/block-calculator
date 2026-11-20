@@ -47,7 +47,7 @@
                             <td class="cell-title">
                                 <span class="person"><span class="avatar" th:text="${#strings.substring(u.displayName, 0, 1)}">A</span>
                                     <span><a th:href="@{/users/{id}(id=${u.id})}" th:text="${u.displayName}">Name</a> <span class="chip gray" th:if="${u.id == me.id}" th:text="#{user.you}">you</span>
-                                        <small th:text="${u.username}">login</small></span></span>
+                                        <small th:text="${u.username + ' · ' + u.email}">login</small></span></span>
                             </td>
                             <td><span class="chip" th:classappend="${u.role.name() == 'MANAGER'} ? 'blue' : (${u.role.name() == 'ADMIN'} ? 'amber' : 'green')" th:text="#{${'role.' + u.role}}">Role</span></td>
                             <td><span class="chip" th:classappend="${u.active} ? 'green' : 'gray'" th:text="${u.active} ? #{user.active} : #{user.blocked}">Active</span></td>
@@ -81,6 +81,9 @@
                     <form th:action="@{/users}" method="post">
                         <div class="field"><label class="lbl" for="nu-username" th:text="#{user.username}">Username</label>
                             <input id="nu-username" type="text" name="username" required pattern="[A-Za-z0-9._-]{3,40}" autocomplete="off"></div>
+                        <div class="field"><label class="lbl" for="nu-email" th:text="#{user.email}">E-mail</label>
+                            <input id="nu-email" type="email" name="email" required maxlength="120" autocomplete="off">
+                            <p class="hint" th:text="#{user.email.hint}">The login, password and role are sent to this address.</p></div>
                         <div class="field"><label class="lbl" for="nu-name"><span th:text="#{user.displayName}">Name</span> <span class="opt" th:text="#{common.optional}">(optional)</span></label>
                             <input id="nu-name" type="text" name="displayName" maxlength="80" autocomplete="off"></div>
                         <div class="field"><label class="lbl" for="nu-password" th:text="#{login.password}">Password</label>

@@ -42,10 +42,16 @@ public class UserService implements UserDetailsService {
         return repo.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
-    /** Creates an account without permission checks (bootstrap and tests). */
+    /** Creates an account without permission checks (bootstrap, demo data and tests). */
     public UserAccount createUnchecked(String username, String password, String displayName, Role role, String createdBy) {
+        return createUnchecked(username, password, displayName, role, createdBy, username + "@example.test");
+    }
+
+    public UserAccount createUnchecked(String username, String password, String displayName, Role role, String createdBy,
+                                       String email) {
         UserAccount u = new UserAccount();
         u.username = username;
+        u.email = email;
         u.passwordHash = encoder.encode(password);
         u.displayName = displayName == null || displayName.isBlank() ? username : displayName.trim();
         u.role = role;
@@ -56,7 +62,7 @@ public class UserService implements UserDetailsService {
     }
 
     /** Admin creates managers and workers; a manager creates workers. */
-    public UserAccount create(CurrentUser actor, String username, String password, String displayName, Role role) {
+    public UserAccount create(CurrentUser actor, String username, String email, String password, String displayName, Role role) {
         boolean allowed = (actor.getRole() == Role.ADMIN && (role == Role.MANAGER || role == Role.WORKER))
                 || (actor.getRole() == Role.MANAGER && role == Role.WORKER);
         if (!allowed) {
@@ -66,10 +72,17 @@ public class UserService implements UserDetailsService {
         if (!name.matches("[A-Za-z0-9._-]{3,40}") || password == null || password.length() < MIN_PASSWORD) {
             throw new BusinessException("error.user.invalid", MIN_PASSWORD);
         }
+        String mail = email == null ? "" : email.trim();
+        if (mail.length() > 120 || !mail.matches("[^@\\s]+@[^@\\s]+\\.[^@\\s]+")) {
+            throw new BusinessException("error.user.email");
+        }
         if (repo.existsByUsername(name)) {
             throw new BusinessException("error.user.exists");
         }
-        return createUnchecked(name, password, displayName, role, actor.getId());
+        if (repo.existsByEmailIgnoreCase(mail)) {
+            throw new BusinessException("error.user.emailExists");
+        }
+        return createUnchecked(name, password, displayName, role, actor.getId(), mail);
     }
 
     public void setActive(CurrentUser actor, String userId, boolean active) {
@@ -130,7 +143,8 @@ public class UserService implements UserDetailsService {
     }
 
     private static boolean matches(UserAccount u, String needle) {
-        return needle.isEmpty() || u.username.toLowerCase().contains(needle) || u.displayName.toLowerCase().contains(needle);
+        return needle.isEmpty() || u.username.toLowerCase().contains(needle) || u.displayName.toLowerCase().contains(needle)
+                || (u.email != null && u.email.toLowerCase().contains(needle));
     }
 
     public List<UserAccount> activeWorkers() {

@@ -3,6 +3,7 @@ package org.example.blockcalc.project;
 import org.example.blockcalc.common.BusinessException;
 import org.example.blockcalc.common.CurrentUser;
 import org.example.blockcalc.common.Limits;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.Role;
 import org.example.blockcalc.user.UserRepository;
 import org.springframework.http.HttpStatus;
@@ -26,10 +27,12 @@ public class ProjectService {
 
     private final ProjectRepository repo;
     private final UserRepository users;
+    private final SettingsService settings;
 
-    public ProjectService(ProjectRepository repo, UserRepository users) {
+    public ProjectService(ProjectRepository repo, UserRepository users, SettingsService settings) {
         this.repo = repo;
         this.users = users;
+        this.settings = settings;
     }
 
     public Project ensureSystemProject() {
@@ -87,7 +90,10 @@ public class ProjectService {
     /** Switches the project currency and converts every price with a manually entered rate. */
     public Project changeCurrency(CurrentUser actor, String id, String newCurrency, BigDecimal rate) {
         requireStaff(actor);
-        if (newCurrency == null || newCurrency.isBlank() || rate == null || rate.signum() <= 0
+        if (newCurrency == null || !settings.hasCurrency(newCurrency)) {
+            throw new BusinessException("error.project.currency.unknown");
+        }
+        if (rate == null || rate.signum() <= 0
                 || rate.compareTo(BigDecimal.valueOf(Limits.MAX_RATE)) > 0) {
             throw new BusinessException("error.project.currency", Limits.MAX_RATE);
         }
@@ -115,12 +121,13 @@ public class ProjectService {
             }
             p.name = in.name().trim();
         }
-        if (in.currency() == null || in.currency().isBlank()
-                || notPositive(in.ws()) || notPositive(in.sandDensity()) || notPositive(in.stoneDensity())
-                || missingOrNegative(in.sandAmount()) || missingOrNegative(in.stoneAmount()) || missingOrNegative(in.cementAmount())
-                || !oneOf(in.sandUnit(), PriceUnit.PER_KG, PriceUnit.PER_M3)
-                || !oneOf(in.stoneUnit(), PriceUnit.PER_KG, PriceUnit.PER_M3)
-                || !oneOf(in.cementUnit(), PriceUnit.PER_KG, PriceUnit.PER_BAG)) {
+        if (in.currency() == null || !settings.hasCurrency(in.currency())) {
+            throw new BusinessException("error.project.currency.unknown");
+        }
+        if (missingOrNegative(in.sandAmount()) || missingOrNegative(in.stoneAmount()) || missingOrNegative(in.cementAmount())
+                || !PriceUnit.BULK.contains(in.sandUnit())
+                || !PriceUnit.BULK.contains(in.stoneUnit())
+                || !PriceUnit.CEMENT.contains(in.cementUnit())) {
             throw new BusinessException("error.project.invalid");
         }
         BigDecimal maxPrice = BigDecimal.valueOf(Limits.MAX_PRICE);
@@ -128,15 +135,7 @@ public class ProjectService {
                 || in.cementAmount().compareTo(maxPrice) > 0) {
             throw new BusinessException("error.project.limit", Limits.MAX_PRICE);
         }
-        if (in.ws().compareTo(BigDecimal.valueOf(Limits.MAX_WS)) > 0
-                || in.sandDensity().compareTo(BigDecimal.valueOf(Limits.MAX_DENSITY)) > 0
-                || in.stoneDensity().compareTo(BigDecimal.valueOf(Limits.MAX_DENSITY)) > 0) {
-            throw new BusinessException("error.project.invalid");
-        }
         p.currency = in.currency().trim().toUpperCase();
-        p.wsDefault = in.ws();
-        p.sandDensity = in.sandDensity();
-        p.stoneDensity = in.stoneDensity();
         p.sandPrice = new PriceEntry(in.sandAmount(), in.sandUnit());
         p.stonePrice = new PriceEntry(in.stoneAmount(), in.stoneUnit());
         p.cementPrice = new PriceEntry(in.cementAmount(), in.cementUnit());
@@ -152,18 +151,9 @@ public class ProjectService {
         }
     }
 
-    /** True when the value is missing or not greater than zero. */
-    private static boolean notPositive(BigDecimal v) {
-        return v == null || v.signum() <= 0;
-    }
-
     /** True when the value is missing or negative. */
     private static boolean missingOrNegative(BigDecimal v) {
         return v == null || v.signum() < 0;
-    }
-
-    private static boolean oneOf(PriceUnit u, PriceUnit a, PriceUnit b) {
-        return u == a || u == b;
     }
 
     private static void requireStaff(CurrentUser actor) {

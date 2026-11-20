@@ -58,8 +58,8 @@ Feature: Calculate materials and cost
       | cement kg  | 250.00  |
       | total      | 4750.00 |
 
-  Scenario: WS comes from the project when it is not entered
-    Given project "Alpha" has default WS 100
+  Scenario: WS comes from the application settings when it is not entered
+    Given the global wheelbarrow weight is set to 100
     When I create a calculation:
       | title | project | full | half | batch | roundUp |
       | Walls | Alpha   | 28   | 0    | 4     | true    |

@@ -10,6 +10,7 @@ public class UserAccount {
     @Id
     public String id;
     public String username;
+    public String email;
     public String passwordHash;
     public String displayName;
     public Role role;

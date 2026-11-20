@@ -47,3 +47,24 @@ Run a single user story tests:
 ```
 
 Test report: `app/build/reports/cucumber.html`.
+
+## Application Settings
+
+Managers and admins open **Settings** in the sidebar to manage values shared by all projects:
+
+- the list of currencies (projects choose their currency from it; a currency used by a project cannot be removed);
+- the default wheelbarrow weight (WS), used when a calculation has no value of its own.
+
+Sand and stone densities are fixed (1600 and 1450 kg/m³), a cement bag is 50 kg and a tonne is 1000 kg. Prices can be entered per kg, per m³, per tonne, or per bag (cement).
+
+## Welcome E-mail
+
+When a manager creates an employee, the e-mail address is required and the employee receives an e-mail with the login, password, and role.
+
+- With Docker Compose, e-mails are caught by [Mailpit](https://mailpit.axllent.org/): open [http://localhost:8025](http://localhost:8025).
+- For a real SMTP server, set `APP_MAIL_ENABLED=true`, `SPRING_MAIL_HOST`, `SPRING_MAIL_PORT` (and `SPRING_MAIL_USERNAME`, `SPRING_MAIL_PASSWORD`, `MAIL_FROM`, `PUBLIC_URL` as needed).
+- Without mail settings, the account is still created and the manager is told to pass the credentials on personally.
+
+## Input Limits
+
+Prices up to 1,000,000, blocks up to 10,000,000, WS up to 10,000 (`common/Limits.java`).

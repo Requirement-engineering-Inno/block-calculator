@@ -24,28 +24,14 @@
                             <label class="lbl" for="name" th:text="#{project.name}">Name</label>
                             <input id="name" type="text" name="name" th:value="${p.name}" maxlength="100" required>
                         </div>
-                        <div class="row2">
-                            <div class="field">
-                                <label class="lbl" for="currency" th:text="#{project.currency}">Currency</label>
-                                <input id="currency" type="text" name="currency" th:value="${p.currency}" required maxlength="8">
-                            </div>
-                            <div class="field">
-                                <label class="lbl" for="ws" th:text="#{project.ws}">Default WS</label>
-                                <div class="input-group"><input id="ws" type="number" name="ws" min="1" max="10000" step="any" th:value="${p.wsDefault.toPlainString()}" required><span class="suffix" th:text="#{unit.kg}">kg</span></div>
-                            </div>
+                        <div class="field">
+                            <label class="lbl" for="currency" th:text="#{project.currency}">Currency</label>
+                            <select id="currency" name="currency" required>
+                                <option th:each="c : ${currencies}" th:value="${c}" th:selected="${c == p.currency}" th:text="${c}">RUB</option>
+                            </select>
+                            <p class="hint"><span th:text="#{project.currency.global}">Currencies are managed in the application settings.</span>
+                                <a th:if="${me.staff}" th:href="@{/settings}" th:text="#{nav.settings}">Settings</a></p>
                         </div>
-                        <p class="hint" style="margin:-6px 0 18px" th:text="#{project.ws.hint}">Weight of one wheelbarrow of sand or stone.</p>
-                        <div class="row2">
-                            <div class="field">
-                                <label class="lbl" for="sandDensity" th:text="#{project.sandDensity}">Sand density</label>
-                                <div class="input-group"><input id="sandDensity" type="number" name="sandDensity" min="1" max="10000" step="any" th:value="${p.sandDensity.toPlainString()}" required><span class="suffix">kg/m³</span></div>
-                            </div>
-                            <div class="field">
-                                <label class="lbl" for="stoneDensity" th:text="#{project.stoneDensity}">Stone density</label>
-                                <div class="input-group"><input id="stoneDensity" type="number" name="stoneDensity" min="1" max="10000" step="any" th:value="${p.stoneDensity.toPlainString()}" required><span class="suffix">kg/m³</span></div>
-                            </div>
-                        </div>
-                        <p class="hint" th:text="#{project.density.hint}">Densities convert prices per m³ into prices per kg.</p>
                     </div>
                 </section>
 
@@ -53,27 +39,28 @@
                     <div class="card-head"><h2 th:text="#{project.section.prices}">Material prices</h2><span class="step" th:text="#{project.price.max(${1000000})}">Up to 1,000,000</span></div>
                     <div class="card-body">
                         <div class="price-row">
-                            <span class="name"><span class="dot"></span><span th:text="#{material.sand}">Sand</span></span>
+                            <span class="name"><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><span th:text="#{material.sand}">Sand</span></span>
                             <div class="input-group">
                                 <input type="number" name="sandAmount" min="0" max="1000000" step="any" th:value="${p.sandPrice.amount.toPlainString()}" required th:aria-label="#{material.sand}">
-                                <select name="sandUnit" th:aria-label="#{material.sand}"><option th:each="u : ${areaUnits}" th:value="${u.name()}" th:selected="${u == p.sandPrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
+                                <select name="sandUnit" th:aria-label="#{material.sand}"><option th:each="u : ${bulkUnits}" th:value="${u.name()}" th:selected="${u == p.sandPrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
                             </div>
                         </div>
                         <div class="price-row">
-                            <span class="name"><span class="dot stone"></span><span th:text="#{material.stone}">Stone</span></span>
+                            <span class="name"><img class="mat-ico" th:src="@{/img/stone.svg}" alt=""><span th:text="#{material.stone}">Stone</span></span>
                             <div class="input-group">
                                 <input type="number" name="stoneAmount" min="0" max="1000000" step="any" th:value="${p.stonePrice.amount.toPlainString()}" required th:aria-label="#{material.stone}">
-                                <select name="stoneUnit" th:aria-label="#{material.stone}"><option th:each="u : ${areaUnits}" th:value="${u.name()}" th:selected="${u == p.stonePrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
+                                <select name="stoneUnit" th:aria-label="#{material.stone}"><option th:each="u : ${bulkUnits}" th:value="${u.name()}" th:selected="${u == p.stonePrice.unit}" th:text="#{${'unit.' + u.name()}}">per m³</option></select>
                             </div>
                         </div>
                         <div class="price-row">
-                            <span class="name"><span class="dot cement"></span><span th:text="#{material.cement}">Cement</span></span>
+                            <span class="name"><img class="mat-ico" th:src="@{/img/cement.svg}" alt=""><span th:text="#{material.cement}">Cement</span></span>
                             <div class="input-group">
                                 <input type="number" name="cementAmount" min="0" max="1000000" step="any" th:value="${p.cementPrice.amount.toPlainString()}" required th:aria-label="#{material.cement}">
                                 <select name="cementUnit" th:aria-label="#{material.cement}"><option th:each="u : ${cementUnits}" th:value="${u.name()}" th:selected="${u == p.cementPrice.unit}" th:text="#{${'unit.' + u.name()}}">per bag</option></select>
                             </div>
                         </div>
                         <p class="hint" th:text="#{project.prices.hint}">Prices are in the project currency.</p>
+                        <p class="fixed-note" th:text="#{project.fixed(${sandDensity}, ${stoneDensity})}">Fixed conversion values.</p>
                     </div>
                 </section>
 
@@ -113,7 +100,9 @@
                     <form th:action="@{/projects/{id}/currency(id=${p.id})}" method="post">
                         <div class="row2">
                             <div class="field"><label class="lbl" for="newCurrency" th:text="#{project.currency.new}">New currency</label>
-                                <input id="newCurrency" type="text" name="currency" required maxlength="8"></div>
+                                <select id="newCurrency" name="currency" required>
+                                    <option th:each="c : ${currencies}" th:if="${c != p.currency}" th:value="${c}" th:text="${c}">USD</option>
+                                </select></div>
                             <div class="field"><label class="lbl" for="rate" th:text="#{project.rate}">Rate</label>
                                 <input id="rate" type="number" name="rate" min="0.000001" max="1000000" step="any" required></div>
                         </div>

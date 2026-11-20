@@ -8,6 +8,7 @@ import org.example.blockcalc.calc.Grant;
 import org.example.blockcalc.project.PriceEntry;
 import org.example.blockcalc.project.PriceUnit;
 import org.example.blockcalc.project.Project;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.Role;
 import org.example.blockcalc.user.UserAccount;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class SetupSteps {
     private TestData data;
     @Autowired
     private World world;
+    @Autowired
+    private SettingsService settings;
 
     @Given("the following users exist:")
     public void usersExist(DataTable table) {
@@ -50,11 +53,14 @@ public class SetupSteps {
         data.save(p);
     }
 
-    @Given("project {string} has default WS {int}")
-    public void projectWs(String name, int ws) {
-        Project p = data.projectByName(name);
-        p.wsDefault = BigDecimal.valueOf(ws);
-        data.save(p);
+    @Given("the global wheelbarrow weight is set to {int}")
+    public void globalWheelbarrow(int kg) {
+        settings.setWheelbarrowUnchecked(BigDecimal.valueOf(kg));
+    }
+
+    @Given("currency {string} is available")
+    public void currencyAvailable(String code) {
+        settings.addCurrencyUnchecked(code);
     }
 
     @Given("worker {string} is assigned to project {string}")

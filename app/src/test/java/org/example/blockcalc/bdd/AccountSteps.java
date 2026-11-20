@@ -18,6 +18,8 @@ public class AccountSteps {
     private TestData data;
     @Autowired
     private World world;
+    @Autowired
+    private RecordingMailGateway mail;
 
     @When("I log in with username {string} and password {string}")
     public void logIn(String username, String password) throws Exception {
@@ -34,9 +36,41 @@ public class AccountSteps {
         createUserWithPassword(username, role, World.PASSWORD);
     }
 
+    @When("sending of e-mails fails")
+    public void mailFails() {
+        mail.failing = true;
+    }
+
+    @Then("a welcome e-mail was sent to {string}")
+    public void welcomeSent(String to) {
+        assertTrue(mail.sent.stream().anyMatch(m -> m.to().equals(to)), "No e-mail to " + to + ", sent: " + mail.sent);
+    }
+
+    @Then("the welcome e-mail to {string} contains {string}")
+    public void welcomeContains(String to, String text) {
+        RecordingMailGateway.Sent m = mail.sent.stream().filter(x -> x.to().equals(to)).findFirst().orElseThrow(
+                () -> new AssertionError("No e-mail to " + to));
+        assertTrue((m.subject() + "\n" + m.body()).contains(text), "E-mail does not contain '" + text + "':\n" + m.body());
+    }
+
+    @Then("no e-mail was sent")
+    public void noMail() {
+        assertEquals(0, mail.sent.size());
+    }
+
+    @When("I create user {string} with role {string} and email {string}")
+    public void createUserWithEmail(String username, String role, String email) throws Exception {
+        postUser(username, role, World.PASSWORD, email);
+    }
+
     @When("I create user {string} with role {string} and password {string}")
     public void createUserWithPassword(String username, String role, String password) throws Exception {
+        postUser(username, role, password, username + "@example.test");
+    }
+
+    private void postUser(String username, String role, String password, String email) throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("email", email);
         params.add("username", username);
         params.add("displayName", username);
         params.add("password", password);

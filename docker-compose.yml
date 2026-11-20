@@ -14,8 +14,20 @@ services:
       MONGODB_URI: mongodb://mongo:27017/blockcalc
       ADMIN_PASSWORD: admin
       APP_DEMO_ENABLED: "true"
+      # Welcome e-mails with login and password go to Mailpit; read them at http://localhost:8025
+      APP_MAIL_ENABLED: "true"
+      SPRING_MAIL_HOST: mailpit
+      SPRING_MAIL_PORT: "1025"
+      PUBLIC_URL: http://localhost:8080
     depends_on:
       - mongo
+      - mailpit
+
+  # Catches every e-mail the application sends. For production replace it with your real SMTP server.
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8025:8025"
 
 volumes:
   mongo-data:

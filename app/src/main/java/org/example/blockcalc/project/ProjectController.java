@@ -1,6 +1,8 @@
 package org.example.blockcalc.project;
 
 import org.example.blockcalc.common.CurrentUser;
+import org.example.blockcalc.common.Materials;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.UserService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -23,10 +25,12 @@ public class ProjectController {
 
     private final ProjectService projects;
     private final UserService users;
+    private final SettingsService settings;
 
-    public ProjectController(ProjectService projects, UserService users) {
+    public ProjectController(ProjectService projects, UserService users, SettingsService settings) {
         this.projects = projects;
         this.users = users;
+        this.settings = settings;
     }
 
     @GetMapping
@@ -78,7 +82,10 @@ public class ProjectController {
         model.addAttribute("selectedWorkers", users.byIds(p.workerIds).values().stream()
                 .sorted(java.util.Comparator.comparing(u -> u.displayName.toLowerCase()))
                 .toList());
-        model.addAttribute("areaUnits", List.of(PriceUnit.PER_KG, PriceUnit.PER_M3));
-        model.addAttribute("cementUnits", List.of(PriceUnit.PER_KG, PriceUnit.PER_BAG));
+        model.addAttribute("bulkUnits", PriceUnit.BULK);
+        model.addAttribute("cementUnits", PriceUnit.CEMENT);
+        model.addAttribute("currencies", settings.currencies());
+        model.addAttribute("sandDensity", Materials.SAND_DENSITY.toPlainString());
+        model.addAttribute("stoneDensity", Materials.STONE_DENSITY.toPlainString());
     }
 }

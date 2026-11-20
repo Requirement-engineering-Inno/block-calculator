@@ -52,3 +52,15 @@ Feature: Create accounts
     Given I am logged in as "boss"
     When I open "/users"
     Then the user list contains "ann"
+
+  Scenario: The e-mail is required
+    Given I am logged in as "boss"
+    When I create user "carl" with role "WORKER" and email "not-an-email"
+    Then I see an error message
+    And the account "carl" does not exist
+
+  Scenario: Two employees cannot share an e-mail
+    Given I am logged in as "boss"
+    When I create user "carl" with role "WORKER" and email "ann@example.test"
+    Then I see an error message
+    And the account "carl" does not exist

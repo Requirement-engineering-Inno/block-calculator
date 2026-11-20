@@ -6,6 +6,7 @@ import org.example.blockcalc.common.BusinessException;
 import org.example.blockcalc.common.CurrentUser;
 import org.example.blockcalc.project.Project;
 import org.example.blockcalc.project.ProjectService;
+import org.example.blockcalc.settings.SettingsService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -35,8 +36,11 @@ public class CalculationController {
     private final ProjectService projects;
     private final PdfService pdf;
     private final MessageSource messages;
+    private final SettingsService settings;
 
-    public CalculationController(CalculationService calcs, ProjectService projects, PdfService pdf, MessageSource messages) {
+    public CalculationController(CalculationService calcs, ProjectService projects, PdfService pdf, MessageSource messages,
+                                 SettingsService settings) {
+        this.settings = settings;
         this.calcs = calcs;
         this.projects = projects;
         this.pdf = pdf;
@@ -78,7 +82,7 @@ public class CalculationController {
     private void fillForm(Model model, CalcForm form, List<Project> choices, Project current, boolean editing) {
         model.addAttribute("f", form);
         model.addAttribute("projects", choices);
-        model.addAttribute("wsHint", current.wsDefault.toPlainString());
+        model.addAttribute("wsHint", settings.wheelbarrowKg().stripTrailingZeros().toPlainString());
         model.addAttribute("projectName", current.name);
         model.addAttribute("projectSystem", current.system);
         model.addAttribute("editing", editing);

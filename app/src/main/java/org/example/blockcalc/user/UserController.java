@@ -1,6 +1,7 @@
 package org.example.blockcalc.user;
 
 import org.example.blockcalc.common.CurrentUser;
+import org.example.blockcalc.mail.WelcomeMailService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Locale;
 
 /** Account management. Access is limited to admin and manager in SecurityConfig. */
 @Controller
@@ -22,10 +24,12 @@ public class UserController {
 
     private final UserService users;
     private final ProfileService profiles;
+    private final WelcomeMailService welcome;
 
-    public UserController(UserService users, ProfileService profiles) {
+    public UserController(UserService users, ProfileService profiles, WelcomeMailService welcome) {
         this.users = users;
         this.profiles = profiles;
+        this.welcome = welcome;
     }
 
     @GetMapping
@@ -48,11 +52,16 @@ public class UserController {
     }
 
     @PostMapping
-    public String create(@RequestParam String username, @RequestParam String password,
+    public String create(@RequestParam String username, @RequestParam String email, @RequestParam String password,
                          @RequestParam(required = false) String displayName, @RequestParam Role role,
-                         @AuthenticationPrincipal CurrentUser me, RedirectAttributes ra) {
-        users.create(me, username, password, displayName, role);
-        ra.addFlashAttribute("flash", "flash.user.created");
+                         @AuthenticationPrincipal CurrentUser me, RedirectAttributes ra, Locale locale) {
+        UserAccount created = users.create(me, username, email, password, displayName, role);
+        WelcomeMailService.Result mail = welcome.sendWelcome(created, password, locale);
+        ra.addFlashAttribute("flash", switch (mail) {
+            case SENT -> "flash.user.created.mailed";
+            case FAILED -> "flash.user.created.mailFailed";
+            case DISABLED -> "flash.user.created";
+        });
         return "redirect:/users";
     }
 

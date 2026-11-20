@@ -30,7 +30,7 @@ public class ProfileService {
                           boolean archived, boolean frozen) {
     }
 
-    public record ProfileView(String id, String username, String displayName, Role role, boolean active,
+    public record ProfileView(String id, String username, String displayName, String email, Role role, boolean active,
                               Instant createdAt, String createdBy, boolean self,
                               List<ProjectRef> projects, long authored, long archived, long frozen, long sharedWithMe,
                               List<CalcRef> recent) {
@@ -77,7 +77,7 @@ public class ProfileService {
                 .toList();
 
         String creator = u.createdBy == null ? null : users.findById(u.createdBy).map(x -> x.displayName).orElse(null);
-        return new ProfileView(u.id, u.username, u.displayName, u.role, u.active, u.createdAt, creator, self, refs,
+        return new ProfileView(u.id, u.username, u.displayName, u.email, u.role, u.active, u.createdAt, creator, self, refs,
                 authored.size(), authored.stream().filter(c -> c.archived).count(),
                 authored.stream().filter(c -> c.frozen).count(), shared, recent);
     }

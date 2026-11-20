@@ -7,10 +7,13 @@ public class Hooks {
 
     @Autowired
     private TestData data;
+    @Autowired
+    private RecordingMailGateway mail;
 
     /** Every scenario starts from an empty database. */
     @Before
     public void resetDatabase() {
         data.reset();
+        mail.reset();
     }
 }

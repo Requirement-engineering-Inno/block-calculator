@@ -32,9 +32,6 @@ public class ProjectSteps {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         put(params, row, "name", "");
         put(params, row, "currency", "RUB");
-        put(params, row, "ws", "150");
-        put(params, row, "sandDensity", "1600");
-        put(params, row, "stoneDensity", "1450");
         put(params, row, "sandAmount", "0");
         put(params, row, "sandUnit", "PER_M3");
         put(params, row, "stoneAmount", "0");
@@ -53,9 +50,6 @@ public class ProjectSteps {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
         put(params, row, "name", p.name);
         put(params, row, "currency", p.currency);
-        put(params, row, "ws", p.wsDefault.toPlainString());
-        put(params, row, "sandDensity", p.sandDensity.toPlainString());
-        put(params, row, "stoneDensity", p.stoneDensity.toPlainString());
         put(params, row, "sandAmount", p.sandPrice.amount.toPlainString());
         put(params, row, "sandUnit", p.sandPrice.unit.name());
         put(params, row, "stoneAmount", p.stonePrice.amount.toPlainString());
@@ -86,9 +80,6 @@ public class ProjectSteps {
             String expected = e.getValue();
             switch (key) {
                 case "currency" -> assertEquals(expected, p.currency);
-                case "ws" -> assertNumber(key, expected, p.wsDefault);
-                case "sandDensity" -> assertNumber(key, expected, p.sandDensity);
-                case "stoneDensity" -> assertNumber(key, expected, p.stoneDensity);
                 case "sandAmount" -> assertNumber(key, expected, p.sandPrice.amount);
                 case "stoneAmount" -> assertNumber(key, expected, p.stonePrice.amount);
                 case "cementAmount" -> assertNumber(key, expected, p.cementPrice.amount);

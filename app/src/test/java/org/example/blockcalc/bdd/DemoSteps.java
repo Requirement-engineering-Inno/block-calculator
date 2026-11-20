@@ -7,6 +7,7 @@ import org.example.blockcalc.common.Bootstrap;
 import org.example.blockcalc.demo.DemoData;
 import org.example.blockcalc.project.ProjectRepository;
 import org.example.blockcalc.project.ProjectService;
+import org.example.blockcalc.settings.SettingsService;
 import org.example.blockcalc.user.UserRepository;
 import org.example.blockcalc.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,10 +31,12 @@ public class DemoSteps {
     private CalculationRepository calcs;
     @Autowired
     private TestData data;
+    @Autowired
+    private SettingsService settings;
 
     @When("the demo data is loaded")
     public void load() {
-        new DemoData(bootstrap, users, userService, projects, projectService, calcs).run(null);
+        new DemoData(bootstrap, users, userService, projects, projectService, calcs, settings).run(null);
     }
 
     @Then("there is exactly one account {string}")

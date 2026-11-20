@@ -14,8 +14,8 @@ public class SecurityConfig {
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(a -> a
-                        .requestMatchers("/login", "/error", "/css/**", "/js/**", "/icon.svg", "/favicon.ico").permitAll()
-                        .requestMatchers("/projects/**", "/users/**").hasAnyRole("ADMIN", "MANAGER")
+                        .requestMatchers("/login", "/error", "/css/**", "/js/**", "/img/**", "/icon.svg", "/favicon.ico").permitAll()
+                        .requestMatchers("/projects/**", "/users/**", "/settings/**").hasAnyRole("ADMIN", "MANAGER")
                         .anyRequest().authenticated())
                 .formLogin(f -> f.loginPage("/login").defaultSuccessUrl("/", true).permitAll())
                 .logout(l -> l.logoutSuccessUrl("/login"));

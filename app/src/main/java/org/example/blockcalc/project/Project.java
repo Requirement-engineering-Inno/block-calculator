@@ -1,7 +1,7 @@
 package org.example.blockcalc.project;
 
-import org.example.blockcalc.calc.CalculationEngine;
 import org.example.blockcalc.calc.PerKgPrices;
+import org.example.blockcalc.common.Materials;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -22,10 +22,6 @@ public class Project {
     /** The built-in project every manager can use (and every worker too). */
     public boolean system;
     public String currency = "RUB";
-    /** Default weight of one wheelbarrow, kg. */
-    public BigDecimal wsDefault = new BigDecimal("150");
-    public BigDecimal sandDensity = new BigDecimal("1600");
-    public BigDecimal stoneDensity = new BigDecimal("1450");
     public PriceEntry sandPrice = new PriceEntry(BigDecimal.ZERO, PriceUnit.PER_M3);
     public PriceEntry stonePrice = new PriceEntry(BigDecimal.ZERO, PriceUnit.PER_M3);
     public PriceEntry cementPrice = new PriceEntry(BigDecimal.ZERO, PriceUnit.PER_BAG);
@@ -33,11 +29,11 @@ public class Project {
     public String createdBy;
     public Instant createdAt;
 
-    /** Prices converted to "per kg" using the project's densities and the 50 kg bag. */
+    /** Prices converted to "per kg" with the fixed densities, the 50 kg bag and 1000 kg per tonne. */
     public PerKgPrices perKg() {
         return new PerKgPrices(currency,
-                toKg(sandPrice, sandDensity),
-                toKg(stonePrice, stoneDensity),
+                toKg(sandPrice, Materials.SAND_DENSITY),
+                toKg(stonePrice, Materials.STONE_DENSITY),
                 toKg(cementPrice, null));
     }
 
@@ -45,7 +41,8 @@ public class Project {
         return switch (p.unit) {
             case PER_KG -> p.amount;
             case PER_M3 -> p.amount.divide(density, 10, RoundingMode.HALF_UP);
-            case PER_BAG -> p.amount.divide(CalculationEngine.BAG_KG, 10, RoundingMode.HALF_UP);
+            case PER_TONNE -> p.amount.divide(Materials.KG_PER_TONNE, 10, RoundingMode.HALF_UP);
+            case PER_BAG -> p.amount.divide(Materials.BAG_KG, 10, RoundingMode.HALF_UP);
         };
     }
 }

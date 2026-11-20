@@ -1,6 +1,6 @@
 @US-04
 Feature: Manage projects and their settings
-  As a manager I want to create projects with their own prices, currency and default WS,
+  As a manager I want to create projects with their own prices and a currency from the application list,
   so that every project is calculated with its own conditions.
 
   Background:
@@ -29,24 +29,21 @@ Feature: Manage projects and their settings
       | cementAmount | 500     |
       | cementUnit   | PER_BAG |
 
-  Scenario: A new project gets the default WS and densities
+  Scenario: A project can use any currency from the list
     Given I am logged in as "boss"
     When I create a project:
       | name  | currency |
-      | Alpha | RUB      |
+      | Alpha | EUR      |
     Then project "Alpha" is stored with:
-      | ws           | 150  |
-      | sandDensity  | 1600 |
-      | stoneDensity | 1450 |
+      | currency | EUR |
 
-  Scenario: The default WS can be changed in the project settings
-    Given project "Alpha" exists
-    And I am logged in as "boss"
-    When I update project "Alpha" with:
-      | ws  |
-      | 120 |
-    Then project "Alpha" is stored with:
-      | ws | 120 |
+  Scenario: A currency that is not in the list is rejected
+    Given I am logged in as "boss"
+    When I create a project:
+      | name  | currency |
+      | Alpha | XXX      |
+    Then I see an error message
+    And project "Alpha" has not been created
 
   Scenario: Every manager sees all projects
     Given project "Alpha" exists
@@ -90,10 +87,3 @@ Feature: Manage projects and their settings
       | sandAmount   | 1000001      |
       | stoneAmount  | 100000000000 |
       | cementAmount | 5000000      |
-
-  Scenario: A huge WS is rejected
-    Given I am logged in as "boss"
-    When I create a project:
-      | name  | ws    |
-      | Alpha | 20000 |
-    Then I see an error message

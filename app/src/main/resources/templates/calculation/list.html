@@ -79,7 +79,7 @@
                 <h2 th:text="#{calc.noMatch}">Nothing matches your search</h2>
             </div>
             <div class="empty" th:if="${rows.isEmpty()}">
-                <svg class="ic"><use href="#i-calc"/></svg>
+                <img class="empty-art" th:src="@{/img/blocks.svg}" alt="">
                 <h2 th:text="#{calc.empty.title}">No calculations yet</h2>
                 <p th:text="#{calc.empty.text}">Create your first estimate in a minute.</p>
                 <a class="btn primary" th:href="@{/calculations/new}" th:text="#{calc.new}">New calculation</a>

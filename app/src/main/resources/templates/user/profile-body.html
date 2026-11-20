@@ -17,6 +17,7 @@
         <div class="card-body" style="padding-top:0">
             <dl class="kv">
                 <dt th:text="#{user.username}">Username</dt><dd id="profile-username" th:text="${p.username()}">login</dd>
+                <dt th:text="#{user.email}">E-mail</dt><dd id="profile-email" th:text="${p.email() != null} ? ${p.email()} : '—'">mail</dd>
                 <dt th:text="#{profile.since}">Account created</dt>
                 <dd><time id="profile-created" th:if="${p.createdAt() != null}" th:datetime="${p.createdAt()}" th:text="${@times.gmt(p.createdAt())}">2026-11-17 10:00 GMT</time><span th:if="${p.createdAt() == null}">—</span></dd>
                 <dt th:text="#{profile.createdBy}">Created by</dt><dd th:text="${p.createdBy() != null} ? ${p.createdBy()} : '—'">Admin</dd>
