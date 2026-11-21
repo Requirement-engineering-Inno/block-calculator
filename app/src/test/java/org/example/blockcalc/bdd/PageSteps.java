@@ -41,20 +41,21 @@ public class PageSteps {
             "updated by", "#meta-updated-by",
             "updated", "#meta-updated");
 
-    private static final Map<String, String> BUTTONS = Map.of(
-            "edit", "#btn-edit",
-            "archive", "#btn-archive",
-            "restore", "#btn-restore",
-            "delete", "#btn-delete",
-            "freeze", "#btn-freeze",
-            "unfreeze", "#btn-unfreeze",
-            "pdf", "#btn-pdf",
-            "share", "#btn-share",
-            "share all", "#btn-share-all",
-            "print", "#btn-print",
-            "tour", "[data-tour-start]",
-            "new project", "#btn-new",
-            "area settings", "#btn-area-settings");
+    private static final Map<String, String> BUTTONS = Map.ofEntries(
+            Map.entry("edit", "#btn-edit"),
+            Map.entry("archive", "#btn-archive"),
+            Map.entry("restore", "#btn-restore"),
+            Map.entry("delete", "#btn-delete"),
+            Map.entry("freeze", "#btn-freeze"),
+            Map.entry("unfreeze", "#btn-unfreeze"),
+            Map.entry("pdf", "#btn-pdf"),
+            Map.entry("share", "#btn-share"),
+            Map.entry("share all", "#btn-share-all"),
+            Map.entry("print", "#btn-print"),
+            Map.entry("tour", "[data-tour-start]"),
+            Map.entry("new project", "#btn-new"),
+            Map.entry("area settings", "#btn-area-settings")
+    );
 
     private static final String MONEY = "#res-total, #res-sand-cost, #res-stone-cost, #res-cement-cost, #res-cost-per-block, #res-currency";
 
