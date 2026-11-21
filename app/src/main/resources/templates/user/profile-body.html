@@ -37,8 +37,7 @@
             <p class="hint" th:if="${p.projects().isEmpty()}" th:text="#{profile.projects.none}">No projects.</p>
             <div class="chip-row">
                 <span th:each="pr : ${p.projects()}" th:attr="data-profile-project=${pr.name()}">
-                    <a class="chip green" th:if="${me.staff}" th:href="@{/projects/{id}(id=${pr.id()})}" th:text="${pr.system()} ? #{project.system} : ${pr.name()}">Project</a>
-                    <span class="chip green" th:unless="${me.staff}" th:text="${pr.system()} ? #{project.system} : ${pr.name()}">Project</span>
+                    <a class="chip green" th:href="@{/projects/{id}(id=${pr.id()})}" th:text="${pr.system()} ? #{project.system} : ${pr.name()}">Production area</a>
                 </span>
             </div>
         </div>

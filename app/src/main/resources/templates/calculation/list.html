@@ -3,13 +3,13 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('calcs')}"></aside>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
 <div class="app-shell">
-    <header th:replace="~{fragments :: topbar(#{nav.calculations})}"></header>
+    <header th:replace="~{fragments :: topbar(#{calc.list.title})}"></header>
     <main>
         <div class="page-head">
             <div>
-                <div class="eyebrow" th:text="#{calc.list.eyebrow}">Your estimates</div>
+                <div class="eyebrow"><a th:href="@{/projects}" th:text="#{project.back}">All production areas</a></div>
                 <h1 th:text="#{calc.list.title}">Calculations</h1>
                 <p th:text="#{calc.list.subtitle}">All estimates you can access.</p>
             </div>
@@ -48,32 +48,7 @@
                 </div>
             </div>
 
-            <div class="table-wrap" th:if="${!rows.isEmpty()}">
-                <table id="calc-table" class="data">
-                    <thead>
-                    <tr>
-                        <th th:text="#{calc.title}">Title</th>
-                        <th class="col-hide-sm" th:text="#{calc.author}">Author</th>
-                        <th class="col-hide-sm" th:text="#{calc.updated}">Updated</th>
-                        <th class="num" th:text="#{calc.total}">Total</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="r : ${rows}" th:classappend="${r.archived()} ? 'archived' : ''"
-                        th:attr="data-calc-title=${r.title()},data-archived=${r.archived()},data-frozen=${r.frozen()}">
-                        <td class="cell-title">
-                            <a th:href="@{/calculations/{id}(id=${r.id()})}" th:text="${r.title()}">Walls</a>
-                            <span class="badge frozen" th:if="${r.frozen()}"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.frozen}">Frozen</span></span>
-                            <span class="badge archived" th:if="${r.archived()}"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archived}">Archived</span></span>
-                            <small th:text="${r.projectSystem()} ? #{project.system} : ${r.project()}">Project</small>
-                        </td>
-                        <td class="col-hide-sm"><span class="person"><span class="avatar sm" th:text="${#strings.substring(r.author(), 0, 1)}">A</span><span th:text="${r.author()}">Author</span></span></td>
-                        <td class="col-hide-sm"><time th:datetime="${r.updatedAt()}" th:text="${@times.gmt(r.updatedAt())}">2026-11-17 10:00 GMT</time></td>
-                        <td class="num"><strong data-num th:text="${r.total()}">0</strong> <span class="sub" style="display:inline" th:text="${r.currency()}">RUB</span></td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
+            <div th:replace="~{calculation/table :: table}"></div>
             <div class="empty" id="no-match" hidden>
                 <svg class="ic"><use href="#i-search"/></svg>
                 <h2 th:text="#{calc.noMatch}">Nothing matches your search</h2>

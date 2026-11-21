@@ -14,10 +14,11 @@
                 <p th:text="#{settings.subtitle}">Values shared by all projects.</p>
             </div>
         </div>
+        <nav th:replace="~{fragments :: settingsTabs('general')}"></nav>
 
         <div class="grid-main">
             <section class="card" id="wheelbarrow-card">
-                <div class="card-head"><h2 th:text="#{settings.wheelbarrow}">Wheelbarrow weight</h2><img class="mat-ico" th:src="@{/img/wheelbarrow.svg}" alt=""></div>
+                <div class="card-head"><h2><span th:text="#{settings.wheelbarrow}">Wheelbarrow weight</span> <span th:replace="~{fragments :: tip(#{tip.form.ws})}"></span></h2><img class="mat-ico" th:src="@{/img/wheelbarrow.svg}" alt=""></div>
                 <div class="card-body">
                     <p class="hint" style="margin:0 0 16px" th:text="#{settings.wheelbarrow.hint}">One wheelbarrow of sand or stone. Used when a calculation has no value of its own.</p>
                     <form th:action="@{/settings/wheelbarrow}" method="post">
@@ -34,7 +35,7 @@
             </section>
 
             <section class="card" id="currencies-card">
-                <div class="card-head"><h2 th:text="#{settings.currencies}">Currencies</h2></div>
+                <div class="card-head"><h2><span th:text="#{settings.currencies}">Currencies</span> <span th:replace="~{fragments :: tip(#{tip.settings.currencies})}"></span></h2></div>
                 <div class="card-body">
                     <p class="hint" style="margin:0 0 14px" th:text="#{settings.currencies.hint}">Projects choose their currency from this list.</p>
                     <ul id="currency-list" class="currency-list">

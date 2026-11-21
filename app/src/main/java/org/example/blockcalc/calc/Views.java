@@ -10,8 +10,10 @@ public final class Views {
     private Views() {
     }
 
+    /** {@code total} and {@code currency} are null for workers: they see the number of blocks instead of money. */
     public record CalcRow(String id, String title, String project, boolean projectSystem, String author,
-                          Instant updatedAt, boolean archived, boolean frozen, String total, String currency) {
+                          Instant updatedAt, boolean archived, boolean frozen, String total, String currency,
+                          String blocks) {
     }
 
     public record GrantRow(String userId, String username, String name, AccessLevel level) {
@@ -25,6 +27,7 @@ public final class Views {
             CalcResult result,
             boolean canEdit, boolean canWrite, boolean canShare, boolean canDelete, boolean canFreeze,
             boolean canShareAll,
+            boolean showMoney,
             List<GrantRow> grants) {
     }
 

@@ -10,7 +10,8 @@ Feature: Calculate materials and cost
       | ann      | WORKER  |
     And project "Alpha" exists
     And worker "ann" is assigned to project "Alpha"
-    And I am logged in as "ann"
+    And I am logged in as "boss"
+    # Managers see the costs; workers see only quantities (see US-22)
     # Alpha prices in the tests: sand 1, stone 2, cement 10 per kg, currency RUB
 
   Scenario: The customer's example, batches rounded up

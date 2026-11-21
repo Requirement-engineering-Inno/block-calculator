@@ -3,18 +3,19 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
 <div class="app-shell">
-    <header th:replace="~{fragments :: topbar(#{nav.projects})}"></header>
+    <header th:replace="~{fragments :: topbar(#{nav.areas})}"></header>
     <main>
         <div class="page-head">
             <div>
-                <div class="eyebrow" th:text="#{project.list.eyebrow}">Configuration</div>
-                <h1 th:text="#{project.list.title}">Projects</h1>
-                <p th:text="#{project.list.subtitle}">Prices, currency and workers for every project.</p>
+                <div class="eyebrow" th:text="#{area.list.eyebrow}">Home</div>
+                <h1><span th:text="#{area.list.title}">Production areas</span> <span th:replace="~{fragments :: tip(#{tip.area.what})}"></span></h1>
+                <p th:text="${me.staff} ? #{area.list.subtitle} : #{area.list.subtitle.worker}">Open an area to work with its projects.</p>
             </div>
             <div class="page-actions">
-                <a id="btn-new-project" class="btn primary" th:href="@{/projects/new}"><svg class="ic"><use href="#i-plus"/></svg><span th:text="#{project.new}">New project</span></a>
+                <button type="button" class="btn ghost sm tour-start" data-tour-start data-tour="tour-btn" th:attr="data-tip=#{tip.tour.replay}"><svg class="ic"><use href="#i-help"/></svg><span th:text="#{tour.replay}">Take a tour</span></button>
+                <a id="btn-new-project" class="btn primary" data-tour="area-new" th:if="${me.staff}" th:href="@{/projects/new}" th:attr="data-tip=#{tip.area.new}"><svg class="ic"><use href="#i-plus"/></svg><span th:text="#{project.new}">New production area</span></a>
             </div>
         </div>
         <section class="card">
@@ -23,7 +24,7 @@
                     <svg class="ic"><use href="#i-search"/></svg>
                     <input id="project-search" type="search" th:placeholder="#{project.search}" autocomplete="off">
                 </label>
-                <select id="project-currency" th:aria-label="#{project.currency}">
+                <select id="project-currency" th:if="${me.staff}" th:aria-label="#{project.currency}">
                     <option value="" th:text="#{project.filter.anyCurrency}">Any currency</option>
                     <option th:each="c : ${currencies}" th:value="${c}" th:text="${c}">RUB</option>
                 </select>
@@ -33,26 +34,31 @@
                     <thead>
                     <tr>
                         <th th:text="#{project.name}">Name</th>
-                        <th th:text="#{project.currency}">Currency</th>
-                        <th class="col-hide-sm" th:text="#{project.prices}">Prices</th>
-                        <th class="num" th:text="#{project.workers}">Workers</th>
+                        <th th:if="${me.staff}"><span th:text="#{project.currency}">Currency</span> <span th:replace="~{fragments :: tip(#{tip.area.currency})}"></span></th>
+                        <th class="col-hide-sm" th:if="${me.staff}"><span th:text="#{project.prices}">Prices</span> <span th:replace="~{fragments :: tip(#{tip.area.prices})}"></span></th>
+                        <th class="num"><span th:text="#{area.projects}">Projects</span> <span th:replace="~{fragments :: tip(#{tip.area.projects})}"></span></th>
+                        <th class="num" th:if="${me.staff}"><span th:text="#{project.workers}">Workers</span> <span th:replace="~{fragments :: tip(#{tip.area.workers})}"></span></th>
+                        <th class="go"><span class="sr-only" th:text="#{common.open}">Open</span></th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:each="p : ${projects}" th:attr="data-project=${p.name},data-currency=${p.currency}">
-                        <td class="cell-title">
-                            <a th:href="@{/projects/{id}(id=${p.id})}" th:text="${p.system} ? #{project.system} : ${p.name}">Project</a>
+                    <tr th:each="p, st : ${projects}" th:attr="data-project=${p.name},data-href=@{/projects/{id}(id=${p.id})}"
+                        th:with="rowTour=${st.first} ? 'area-row' : null">
+                        <td class="cell-title" th:attr="data-tour=${rowTour}">
+                            <a th:href="@{/projects/{id}(id=${p.id})}" th:text="${p.system} ? #{project.system} : ${p.name}">Production area</a>
                             <small th:if="${p.system}" th:text="#{project.system.hint}">Built in</small>
                         </td>
-                        <td><span class="chip" th:text="${p.currency}">RUB</span></td>
-                        <td class="col-hide-sm">
+                        <td th:if="${me.staff}" th:attr="data-currency=${p.currency}"><span class="chip" th:text="${p.currency}">RUB</span></td>
+                        <td class="col-hide-sm" th:if="${me.staff}">
                             <span class="sub" style="margin:0">
                                 <span th:text="#{material.sand}">Sand</span> <span data-num th:text="${p.sandPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.sandPrice.unit}}">/ m³</span> ·
                                 <span th:text="#{material.stone}">Stone</span> <span data-num th:text="${p.stonePrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.stonePrice.unit}}">/ m³</span> ·
                                 <span th:text="#{material.cement}">Cement</span> <span data-num th:text="${p.cementPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.cementPrice.unit}}">/ bag</span>
                             </span>
                         </td>
-                        <td class="num" th:text="${p.system} ? '—' : ${p.workerIds.size()}">0</td>
+                        <td class="num" th:text="${counts.getOrDefault(p.id, 0L)}">0</td>
+                        <td class="num" th:if="${me.staff}" th:text="${p.system} ? '—' : ${p.workerIds.size()}">0</td>
+                        <td class="go"><svg class="ic"><use href="#i-arrow"/></svg></td>
                     </tr>
                     </tbody>
                 </table>
@@ -63,5 +69,6 @@
     <footer th:replace="~{fragments :: foot}"></footer>
 </div>
 <div th:replace="~{fragments :: toast}"></div>
+<th:block th:replace="~{fragments :: tour(${startTour})}"></th:block>
 </body>
 </html>

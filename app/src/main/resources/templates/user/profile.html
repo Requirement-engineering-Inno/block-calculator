@@ -3,7 +3,7 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('users')}"></aside>
+<aside th:replace="~{fragments :: sidebar('settings')}"></aside>
 <div class="app-shell">
     <header th:replace="~{fragments :: topbar(${p.displayName()})}"></header>
     <main>
@@ -22,6 +22,7 @@
                 </form>
             </div>
         </div>
+        <nav th:replace="~{fragments :: settingsTabs('users')}"></nav>
         <div style="max-width:820px"><div th:replace="~{user/profile-body :: body}"></div></div>
     </main>
     <footer th:replace="~{fragments :: foot}"></footer>

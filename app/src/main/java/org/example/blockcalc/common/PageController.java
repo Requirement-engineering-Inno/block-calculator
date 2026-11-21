@@ -8,7 +8,7 @@ public class PageController {
 
     @GetMapping("/")
     public String home() {
-        return "redirect:/calculations";
+        return "redirect:/projects";
     }
 
     @GetMapping("/login")

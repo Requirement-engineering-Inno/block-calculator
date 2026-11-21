@@ -78,29 +78,47 @@ public class PdfService {
             doc.add(input);
 
             CalcResult r = d.result();
+            Mix mix = Mix.of(d.batch());
             doc.add(sectionTitle(msg(locale, "calc.result"), section));
-            PdfPTable res = table(3, new float[]{40, 30, 30}, 0, 0);
-            header(res, normal, msg(locale, "calc.material"), msg(locale, "calc.quantityKg"),
-                    msg(locale, "calc.cost") + ", " + r.currency());
-            res.addCell(cell(msg(locale, "material.cement"), normal, false));
-            res.addCell(cell(r.cementKg().toPlainString(), normal, true));
-            res.addCell(cell(r.cementCost().toPlainString(), normal, true));
-            res.addCell(cell(msg(locale, "material.stone"), normal, false));
-            res.addCell(cell(r.stoneKg().toPlainString(), normal, true));
-            res.addCell(cell(r.stoneCost().toPlainString(), normal, true));
-            res.addCell(cell(msg(locale, "material.sand"), normal, false));
-            res.addCell(cell(r.sandKg().toPlainString(), normal, true));
-            res.addCell(cell(r.sandCost().toPlainString(), normal, true));
-            PdfPCell totalLabel = cell(msg(locale, "calc.total"), section, false);
-            totalLabel.setBackgroundColor(new Color(238, 243, 230));
-            PdfPCell totalEmpty = cell("", normal, true);
-            totalEmpty.setBackgroundColor(new Color(238, 243, 230));
-            PdfPCell totalValue = cell(r.total().toPlainString(), section, true);
-            totalValue.setBackgroundColor(new Color(238, 243, 230));
-            res.addCell(totalLabel);
-            res.addCell(totalEmpty);
-            res.addCell(totalValue);
-            doc.add(res);
+            // Workers get quantities only: no prices, no costs, no total.
+            boolean money = d.showMoney();
+            PdfPTable table = money ? table(4, new float[]{28, 24, 24, 24}, 0, 0) : table(3, new float[]{40, 30, 30}, 0, 0);
+            if (money) {
+                header(table, normal, msg(locale, "calc.material"), msg(locale, "calc.quantityKg"),
+                        msg(locale, "calc.units"), msg(locale, "calc.cost") + ", " + r.currency());
+            } else {
+                header(table, normal, msg(locale, "calc.material"), msg(locale, "calc.quantityKg"), msg(locale, "calc.units"));
+            }
+            materialRow(table, normal, money, msg(locale, "material.cement"), r.cementKg().toPlainString(),
+                    r.cementBags().stripTrailingZeros().toPlainString() + " " + msg(locale, "calc.bags"),
+                    money ? r.cementCost().toPlainString() : null);
+            materialRow(table, normal, money, msg(locale, "material.stone"), r.stoneKg().toPlainString(),
+                    r.stoneBarrows().stripTrailingZeros().toPlainString() + " " + msg(locale, "calc.barrows"),
+                    money ? r.stoneCost().toPlainString() : null);
+            materialRow(table, normal, money, msg(locale, "material.sand"), r.sandKg().toPlainString(),
+                    r.sandBarrows().stripTrailingZeros().toPlainString() + " " + msg(locale, "calc.barrows"),
+                    money ? r.sandCost().toPlainString() : null);
+            if (money) {
+                PdfPCell totalLabel = cell(msg(locale, "calc.total"), section, false);
+                totalLabel.setBackgroundColor(new Color(238, 243, 230));
+                PdfPCell totalEmpty = cell("", normal, true);
+                totalEmpty.setBackgroundColor(new Color(238, 243, 230));
+                PdfPCell totalEmpty2 = cell("", normal, true);
+                totalEmpty2.setBackgroundColor(new Color(238, 243, 230));
+                PdfPCell totalValue = cell(r.total().toPlainString(), section, true);
+                totalValue.setBackgroundColor(new Color(238, 243, 230));
+                table.addCell(totalLabel);
+                table.addCell(totalEmpty);
+                table.addCell(totalEmpty2);
+                table.addCell(totalValue);
+            }
+            doc.add(table);
+
+            doc.add(sectionTitle(msg(locale, "calc.proportions"), section));
+            doc.add(new Paragraph(messages.getMessage("calc.mix.hint",
+                    new Object[]{mix.sandBarrows.stripTrailingZeros().toPlainString(),
+                            mix.stoneBarrows.stripTrailingZeros().toPlainString(), mix.yield},
+                    "calc.mix.hint", locale), normal));
         } catch (DocumentException | IOException e) {
             throw new IllegalStateException("Cannot create PDF", e);
         } finally {
@@ -128,6 +146,15 @@ public class PdfService {
         t.setWidthPercentage(100);
         t.setWidths(widths);
         return t;
+    }
+
+    private static void materialRow(PdfPTable t, Font font, boolean money, String name, String kg, String units, String cost) {
+        t.addCell(cell(name, font, false));
+        t.addCell(cell(kg, font, true));
+        t.addCell(cell(units, font, true));
+        if (money) {
+            t.addCell(cell(cost, font, true));
+        }
     }
 
     private static void row(PdfPTable t, Font font, String label, String value) {

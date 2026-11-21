@@ -14,7 +14,7 @@
             <p id="error-message" th:text="${errorMessage != null ? errorMessage : (status == 403 ? #messages.msg('error.403') : (status == 404 ? #messages.msg('error.404') : #messages.msg('error.generic')))}">Something went wrong</p>
             <div class="page-actions" style="justify-content:center">
                 <a class="btn secondary" href="javascript:history.back()"><svg class="ic"><use href="#i-back"/></svg><span th:text="#{common.back}">Back</span></a>
-                <a class="btn primary" th:href="@{/calculations}"><span th:text="#{error.home}">Go to calculations</span></a>
+                <a class="btn primary" th:href="@{/projects}"><span th:text="#{error.home}">Go to production areas</span></a>
             </div>
         </div>
     </main>

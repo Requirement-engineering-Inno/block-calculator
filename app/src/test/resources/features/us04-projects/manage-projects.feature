@@ -10,7 +10,7 @@ Feature: Manage projects and their settings
       | boss2    | MANAGER |
       | ann      | WORKER  |
 
-  Scenario: The built-in project "Other calculations" exists
+  Scenario: The built-in production area "Other projects" exists
     Given I am logged in as "boss"
     When I open "/projects"
     Then the project list contains "Other calculations"
@@ -59,10 +59,10 @@ Feature: Manage projects and their settings
       | Alpha | -5         |
     Then I see an error message
 
-  Scenario: A worker cannot open the project settings
+  Scenario: A worker cannot open the production area settings
     Given project "Alpha" exists
     And I am logged in as "ann"
-    When I open "/projects"
+    When I open the settings of production area "Alpha"
     Then the response status is 403
 
   Scenario: A price of exactly one million is accepted

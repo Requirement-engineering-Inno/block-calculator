@@ -3,7 +3,7 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('')}"></aside>
+<aside th:replace="~{fragments :: sidebar('settings')}"></aside>
 <div class="app-shell">
     <header th:replace="~{fragments :: topbar(#{account.title})}"></header>
     <main>
@@ -12,6 +12,7 @@
             <h1 th:text="#{account.title}">My account</h1>
             <p th:text="#{account.subtitle}">Your profile and security settings.</p>
         </div></div>
+        <nav th:replace="~{fragments :: settingsTabs('account')}"></nav>
         <div class="grid-main wide-left">
             <div th:replace="~{user/profile-body :: body}"></div>
             <section class="card" id="password-card">

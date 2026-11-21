@@ -43,7 +43,7 @@ Feature: Assign workers to projects
     And I am logged in as "ann"
     When I open the new calculation form
     Then the new calculation form offers project "Alpha"
-    And the new calculation form offers project "Other calculations"
+    And the new calculation form offers project "Other projects"
     And the new calculation form does not offer project "Beta"
 
   Scenario: A worker cannot create a calculation in a project he is not assigned to

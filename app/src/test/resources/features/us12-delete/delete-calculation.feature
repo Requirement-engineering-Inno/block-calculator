@@ -15,7 +15,7 @@ Feature: Delete calculations
   Scenario: A manager deletes a calculation
     Given I am logged in as "boss"
     When I delete calculation "Walls"
-    Then I am redirected to "/calculations"
+    Then I am redirected to the page of production area "Alpha"
     And calculation "Walls" no longer exists
 
   Scenario: The admin deletes a calculation

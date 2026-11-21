@@ -3,61 +3,64 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('calcs')}"></aside>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
 <div class="app-shell">
     <header th:replace="~{fragments :: topbar(${d.title()})}"></header>
     <main>
         <div class="page-head">
             <div>
-                <div class="eyebrow" th:text="${d.projectSystem()} ? #{project.system} : ${d.projectName()}">Project</div>
+                <div class="eyebrow"><a th:href="@{/projects/{id}(id=${d.projectId()})}" th:text="${d.projectSystem()} ? #{project.system} : ${d.projectName()}">Production area</a></div>
                 <h1>
                     <span id="calc-title" th:text="${d.title()}">Walls</span>
-                    <span id="badge-frozen" class="badge frozen" th:if="${d.frozen()}"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.frozen}">Frozen</span></span>
-                    <span id="badge-archived" class="badge archived" th:if="${d.archived()}"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archived}">Archived</span></span>
+                    <span id="badge-frozen" class="badge frozen" th:if="${d.frozen()}" th:attr="data-tip=#{tip.badge.frozen}"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.frozen}">Frozen</span></span>
+                    <span id="badge-archived" class="badge archived" th:if="${d.archived()}" th:attr="data-tip=#{tip.badge.archived}"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archived}">Archived</span></span>
                 </h1>
-                <p th:text="${d.frozen()} ? #{calc.frozen.hint} : (${d.archived()} ? #{calc.archived.hint} : #{calc.by(${d.author()})})">Details</p>
+                <p th:text="${d.frozen()} ? (${d.showMoney()} ? #{calc.frozen.hint} : #{calc.frozen.hint.worker}) : (${d.archived()} ? #{calc.archived.hint} : #{calc.by(${d.author()})})">Details</p>
             </div>
             <div class="page-actions">
-                <a id="btn-back" class="btn ghost" th:href="@{/calculations}"><svg class="ic"><use href="#i-back"/></svg><span th:text="#{common.back}">Back</span></a>
-                <a id="btn-edit" class="btn primary" th:if="${d.canEdit()}" th:href="@{/calculations/{id}/edit(id=${d.id()})}"><svg class="ic"><use href="#i-edit"/></svg><span th:text="#{calc.edit.short}">Edit</span></a>
-                <a id="btn-pdf" class="btn secondary" data-pdf th:href="@{/calculations/{id}/pdf(id=${d.id()})}"><svg class="ic"><use href="#i-download"/></svg><span th:text="#{calc.pdf}">PDF</span></a>
-                <button id="btn-print" type="button" class="btn secondary" data-print th:attr="data-url=@{/calculations/{id}/pdf(id=${d.id()},inline=true)}"><svg class="ic"><use href="#i-print"/></svg><span th:text="#{calc.print}">Print</span></button>
+                <a id="btn-back" class="btn ghost" th:href="@{/projects/{id}(id=${d.projectId()})}"><svg class="ic"><use href="#i-back"/></svg><span th:text="#{calc.backToArea}">Back to production area</span></a>
+                <a id="btn-edit" class="btn primary" th:attr="data-tip=#{tip.btn.edit}" th:if="${d.canEdit()}" th:href="@{/calculations/{id}/edit(id=${d.id()})}"><svg class="ic"><use href="#i-edit"/></svg><span th:text="#{calc.edit.short}">Edit</span></a>
+                <a id="btn-pdf" class="btn secondary" th:attr="data-tip=#{tip.btn.pdf}" data-pdf th:href="@{/calculations/{id}/pdf(id=${d.id()})}"><svg class="ic"><use href="#i-download"/></svg><span th:text="#{calc.pdf}">PDF</span></a>
+                <button id="btn-print" type="button" class="btn secondary" data-print th:attr="data-tip=#{tip.btn.print},data-url=@{/calculations/{id}/pdf(id=${d.id()},inline=true)}"><svg class="ic"><use href="#i-print"/></svg><span th:text="#{calc.print}">Print</span></button>
             </div>
         </div>
 
         <div class="action-bar">
             <form th:if="${d.canWrite() and !d.archived()}" th:action="@{/calculations/{id}/archive(id=${d.id()})}" method="post">
-                <button id="btn-archive" type="submit" class="btn secondary sm"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archive}">Archive</span></button>
+                <button id="btn-archive" type="submit" th:attr="data-tip=#{tip.btn.archive}" class="btn secondary sm"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archive}">Archive</span></button>
             </form>
             <form th:if="${d.canWrite() and d.archived()}" th:action="@{/calculations/{id}/restore(id=${d.id()})}" method="post">
-                <button id="btn-restore" type="submit" class="btn secondary sm"><svg class="ic"><use href="#i-restore"/></svg><span th:text="#{calc.restore}">Restore</span></button>
+                <button id="btn-restore" type="submit" th:attr="data-tip=#{tip.btn.restore}" class="btn secondary sm"><svg class="ic"><use href="#i-restore"/></svg><span th:text="#{calc.restore}">Restore</span></button>
             </form>
             <form th:if="${d.canFreeze() and !d.frozen()}" th:action="@{/calculations/{id}/freeze(id=${d.id()})}" method="post">
-                <button id="btn-freeze" type="submit" class="btn secondary sm"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.freeze}">Freeze prices</span></button>
+                <button id="btn-freeze" type="submit" th:attr="data-tip=#{tip.btn.freeze}" class="btn secondary sm"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.freeze}">Freeze prices</span></button>
             </form>
             <form th:if="${d.canFreeze() and d.frozen()}" th:action="@{/calculations/{id}/unfreeze(id=${d.id()})}" method="post">
-                <button id="btn-unfreeze" type="submit" class="btn secondary sm"><svg class="ic"><use href="#i-unlock"/></svg><span th:text="#{calc.unfreeze}">Unfreeze</span></button>
+                <button id="btn-unfreeze" type="submit" th:attr="data-tip=#{tip.btn.unfreeze}" class="btn secondary sm"><svg class="ic"><use href="#i-unlock"/></svg><span th:text="#{calc.unfreeze}">Unfreeze</span></button>
             </form>
             <form th:if="${d.canDelete()}" th:action="@{/calculations/{id}/delete(id=${d.id()})}" method="post" th:attr="data-confirm=#{calc.delete.confirm}">
-                <button id="btn-delete" type="submit" class="btn danger sm"><svg class="ic"><use href="#i-trash"/></svg><span th:text="#{calc.delete}">Delete</span></button>
+                <button id="btn-delete" type="submit" th:attr="data-tip=#{tip.btn.delete}" class="btn danger sm"><svg class="ic"><use href="#i-trash"/></svg><span th:text="#{calc.delete}">Delete</span></button>
             </form>
         </div>
 
         <div class="grid-main wide-left">
-            <div th:replace="~{calculation/result :: result}"></div>
+            <div class="stack">
+                <div th:replace="~{calculation/result :: result}"></div>
+                <div th:replace="~{calculation/result :: proportions}"></div>
+            </div>
 
             <div class="stack">
                 <section class="card">
                     <div class="card-head"><h2 th:text="#{calc.input}">Input</h2></div>
                     <div class="card-body">
                         <dl class="kv">
-                            <dt th:text="#{calc.project}">Project</dt>
+                            <dt th:text="#{calc.project}">Production area</dt>
                             <dd id="meta-project" th:text="${d.projectSystem()} ? #{project.system} : ${d.projectName()}">Project</dd>
                             <dt th:text="#{calc.fullBlocks}">Full blocks</dt><dd id="in-full" data-num th:text="${d.fullBlocks()}">0</dd>
                             <dt th:text="#{calc.halfBlocks}">Half blocks</dt><dd id="in-half" data-num th:text="${d.halfBlocks()}">0</dd>
-                            <dt th:text="#{calc.batch}">Batch</dt><dd id="in-batch" th:text="${d.batch()}">4</dd>
-                            <dt th:text="#{calc.ws}">WS</dt><dd><span id="in-ws" th:text="${d.ws().stripTrailingZeros().toPlainString()}">150</span> <span th:text="#{unit.kg}">kg</span></dd>
-                            <dt th:text="#{calc.roundUp}">Round batches up</dt><dd id="in-roundup" th:text="${d.roundUp()} ? #{common.yes} : #{common.no}">No</dd>
+                            <dt><span th:text="#{calc.batch}">Batch</span> <span th:replace="~{fragments :: tip(#{tip.form.mix})}"></span></dt><dd id="in-batch" th:text="${d.batch()}">4</dd>
+                            <dt><span th:text="#{calc.ws}">WS</span> <span th:replace="~{fragments :: tip(#{tip.form.ws})}"></span></dt><dd><span id="in-ws" th:text="${d.ws().stripTrailingZeros().toPlainString()}">150</span> <span th:text="#{unit.kg}">kg</span></dd>
+                            <dt><span th:text="#{calc.roundUp}">Round batches up</span> <span th:replace="~{fragments :: tip(#{tip.form.roundup})}"></span></dt><dd id="in-roundup" th:text="${d.roundUp()} ? #{common.yes} : #{common.no}">No</dd>
                         </dl>
                     </div>
                 </section>
@@ -79,7 +82,7 @@
                 </section>
 
                 <section class="card" id="share-panel" th:if="${d.canShare()}">
-                    <div class="card-head"><h2 th:text="#{calc.share}">Sharing</h2><svg class="ic" style="color:#8a9586"><use href="#i-share"/></svg></div>
+                    <div class="card-head"><h2><span th:text="#{calc.share}">Sharing</span> <span th:replace="~{fragments :: tip(#{tip.share.panel})}"></span></h2><svg class="ic" style="color:#8a9586"><use href="#i-share"/></svg></div>
                     <div class="card-body">
                         <p class="hint" style="margin:0 0 14px" th:text="#{calc.share.hint}">Give colleagues access.</p>
                         <p class="hint" th:if="${d.grants().isEmpty()}" th:text="#{calc.share.none}">Not shared yet.</p>
@@ -87,11 +90,24 @@
                             <li th:each="g : ${d.grants()}" th:attr="data-grant-user=${g.username()},data-level=${g.level()}">
                                 <span class="avatar sm" th:text="${#strings.substring(g.name(), 0, 1)}">A</span>
                                 <span class="who" th:text="${g.name()}">Worker</span>
-                                <span class="chip" th:classappend="${g.level().name() == 'READ_WRITE'} ? 'green' : 'gray'" th:text="#{${'access.' + g.level()}}">Read only</span>
-                                <form class="inline" th:action="@{/calculations/{id}/unshare(id=${d.id()})}" method="post">
-                                    <input type="hidden" name="userId" th:value="${g.userId()}">
-                                    <button type="submit" class="btn-icon" th:title="#{calc.unshare}"><svg class="ic"><use href="#i-x"/></svg></button>
-                                </form>
+                                <!-- Click the access level to change it (or to remove the access) -->
+                                <details class="menu">
+                                    <summary class="chip level" th:classappend="${g.level().name() == 'READ_WRITE'} ? 'green' : 'gray'" th:attr="data-tip=#{tip.share.change}">
+                                        <span th:text="#{${'access.' + g.level()}}">Read only</span><svg class="ic"><use href="#i-chev"/></svg>
+                                    </summary>
+                                    <form class="menu-pop" th:action="@{/calculations/{id}/share(id=${d.id()})}" method="post">
+                                        <input type="hidden" name="userId" th:value="${g.userId()}">
+                                        <button type="submit" name="level" value="READ_ONLY" class="menu-item" th:classappend="${g.level().name() == 'READ_ONLY'} ? 'on' : ''" th:attr="data-current=${g.level().name() == 'READ_ONLY'}">
+                                            <svg class="ic"><use href="#i-check"/></svg><span><strong th:text="#{access.READ_ONLY}">Read only</strong><small th:text="#{access.READ_ONLY.hint}">Can view and export</small></span>
+                                        </button>
+                                        <button type="submit" name="level" value="READ_WRITE" class="menu-item" th:classappend="${g.level().name() == 'READ_WRITE'} ? 'on' : ''" th:attr="data-current=${g.level().name() == 'READ_WRITE'}">
+                                            <svg class="ic"><use href="#i-check"/></svg><span><strong th:text="#{access.READ_WRITE}">Read and write</strong><small th:text="#{access.READ_WRITE.hint}">Can also edit and archive</small></span>
+                                        </button>
+                                        <button type="submit" class="menu-item danger" th:formaction="@{/calculations/{id}/unshare(id=${d.id()})}">
+                                            <svg class="ic"><use href="#i-x"/></svg><span><strong th:text="#{calc.unshare}">Remove access</strong></span>
+                                        </button>
+                                    </form>
+                                </details>
                             </li>
                         </ul>
                         <form class="share-form" th:action="@{/calculations/{id}/share(id=${d.id()})}" method="post">
@@ -104,19 +120,20 @@
                                 <div class="picker-results" hidden></div>
                             </div>
                             <div class="share-add">
-                                <select name="level" th:aria-label="#{calc.share.level}">
+                                <select name="level" th:aria-label="#{calc.share.level}" th:attr="data-tip=#{tip.share.level}">
                                     <option value="READ_ONLY" th:text="#{access.READ_ONLY}">Read only</option>
                                     <option value="READ_WRITE" th:text="#{access.READ_WRITE}">Read and write</option>
                                 </select>
                                 <button id="btn-share" type="submit" class="btn primary sm" th:text="#{calc.share.add}">Share</button>
                             </div>
                         </form>
+                        <p class="hint" th:text="#{calc.share.levels}">Read only can view and export. Read and write can also edit and archive.</p>
                         <form th:if="${d.canShareAll()}" class="share-all" th:action="@{/calculations/{id}/share-all(id=${d.id()})}" method="post">
                             <select name="level" th:aria-label="#{calc.share.level}">
                                 <option value="READ_ONLY" th:text="#{access.READ_ONLY}">Read only</option>
                                 <option value="READ_WRITE" th:text="#{access.READ_WRITE}">Read and write</option>
                             </select>
-                            <button id="btn-share-all" type="submit" class="btn secondary sm" th:text="#{calc.share.all}">Share with all workers of the project</button>
+                            <button id="btn-share-all" type="submit" class="btn secondary sm" th:attr="data-tip=#{tip.share.all}" th:text="#{calc.share.all}">Share with all workers of the area</button>
                         </form>
                     </div>
                 </section>

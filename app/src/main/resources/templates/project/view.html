@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" th:lang="${#locale.language}">
+<head th:replace="~{fragments :: head}"></head>
+<body>
+<div th:replace="~{fragments :: icons}"></div>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
+<div class="app-shell">
+    <header th:replace="~{fragments :: topbar(${p.system} ? #{project.system} : ${p.name})}"></header>
+    <main>
+        <div class="page-head">
+            <div>
+                <div class="eyebrow"><a th:href="@{/projects}" th:text="#{project.back}">All production areas</a></div>
+                <h1 th:text="${p.system} ? #{project.system} : ${p.name}">Production area</h1>
+                <p th:text="${p.system} ? #{project.system.hint} : #{area.view.subtitle}">Projects of this area.</p>
+            </div>
+            <div class="page-actions">
+                <a id="btn-area-settings" class="btn secondary" th:if="${me.staff}" th:href="@{/projects/{id}/settings(id=${p.id})}" th:attr="data-tip=#{tip.area.settings}"><svg class="ic"><use href="#i-settings"/></svg><span th:text="#{project.settings}">Settings</span></a>
+                <a id="btn-new" class="btn primary" th:href="@{/calculations/new(projectId=${p.id})}" th:attr="data-tip=#{tip.project.new}"><svg class="ic"><use href="#i-plus"/></svg><span th:text="#{calc.new}">New project</span></a>
+            </div>
+        </div>
+
+        <!-- Prices and team are for managers only -->
+        <section class="card area-facts" th:if="${me.staff}">
+            <div class="card-body facts">
+                <div>
+                    <span class="lbl-s"><span th:text="#{project.currency}">Currency</span> <span th:replace="~{fragments :: tip(#{tip.area.currency})}"></span></span>
+                    <strong><span class="chip" th:text="${p.currency}">RUB</span></strong>
+                </div>
+                <div class="wide">
+                    <span class="lbl-s"><span th:text="#{project.prices}">Prices</span> <span th:replace="~{fragments :: tip(#{tip.area.prices})}"></span></span>
+                    <strong class="prices">
+                        <span th:text="#{material.sand}">Sand</span> <span data-num th:text="${p.sandPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.sandPrice.unit}}">/ m³</span> ·
+                        <span th:text="#{material.stone}">Stone</span> <span data-num th:text="${p.stonePrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.stonePrice.unit}}">/ m³</span> ·
+                        <span th:text="#{material.cement}">Cement</span> <span data-num th:text="${p.cementPrice.amount.stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{${'unit.short.' + p.cementPrice.unit}}">/ bag</span>
+                    </strong>
+                </div>
+                <div th:unless="${p.system}">
+                    <span class="lbl-s"><span th:text="#{project.workers}">Workers</span> <span th:replace="~{fragments :: tip(#{tip.area.workers})}"></span></span>
+                    <strong th:text="${teamSize}">0</strong>
+                </div>
+            </div>
+        </section>
+
+        <div class="stats">
+            <div class="stat" th:attr="data-tip=#{tip.stat.total}"><span th:text="#{calc.stat.total}">Total</span><strong th:text="${rows.size()}">0</strong></div>
+            <div class="stat" th:attr="data-tip=#{tip.stat.active}"><span th:text="#{calc.stat.active}">Active</span><strong th:text="${countActive}">0</strong></div>
+            <div class="stat" th:attr="data-tip=#{tip.stat.frozen}"><span th:text="#{calc.stat.frozen}">Frozen</span><strong th:text="${countFrozen}">0</strong></div>
+            <div class="stat" th:attr="data-tip=#{tip.stat.archived}"><span th:text="#{calc.stat.archived}">Archived</span><strong th:text="${countArchived}">0</strong></div>
+        </div>
+
+        <section class="card">
+            <div class="toolbar">
+                <label class="search"><span class="sr-only" th:text="#{calc.search}">Search</span>
+                    <svg class="ic"><use href="#i-search"/></svg>
+                    <input id="calc-search" type="search" th:placeholder="#{calc.search}" autocomplete="off">
+                </label>
+                <div class="segments" role="group">
+                    <button type="button" class="on" data-filter="all" th:text="#{calc.filter.all}">All</button>
+                    <button type="button" data-filter="active" th:text="#{calc.filter.active}">Active</button>
+                    <button type="button" data-filter="frozen" th:attr="data-tip=#{tip.stat.frozen}" th:text="#{calc.filter.frozen}">Frozen</button>
+                    <button type="button" data-filter="archived" th:attr="data-tip=#{tip.stat.archived}" th:text="#{calc.filter.archived}">Archived</button>
+                </div>
+            </div>
+            <div th:replace="~{calculation/table :: table}"></div>
+            <div class="empty" id="no-match" hidden>
+                <svg class="ic"><use href="#i-search"/></svg>
+                <h2 th:text="#{calc.noMatch}">Nothing matches your search</h2>
+            </div>
+            <div class="empty" th:if="${rows.isEmpty()}">
+                <img class="empty-art" th:src="@{/img/blocks.svg}" alt="">
+                <h2 th:text="#{calc.empty.title}">No projects yet</h2>
+                <p th:text="#{calc.empty.text}">Create your first project in a minute.</p>
+                <a class="btn primary" th:href="@{/calculations/new(projectId=${p.id})}" th:text="#{calc.new}">New project</a>
+            </div>
+        </section>
+    </main>
+    <footer th:replace="~{fragments :: foot}"></footer>
+</div>
+<div th:replace="~{fragments :: toast}"></div>
+</body>
+</html>

@@ -64,6 +64,21 @@ public class ProjectSteps {
         world.post("/projects/" + p.id, params);
     }
 
+    @When("I open the production area {string}")
+    public void openArea(String name) throws Exception {
+        world.get("/projects/" + data.projectByName(name).id);
+    }
+
+    @When("I open the settings of production area {string}")
+    public void openAreaSettings(String name) throws Exception {
+        world.get("/projects/" + data.projectByName(name).id + "/settings");
+    }
+
+    @When("I finish the welcome tour")
+    public void finishTour() throws Exception {
+        world.post("/onboarding/done");
+    }
+
     @When("I change the currency of project {string} to {string} with rate {string}")
     public void changeCurrency(String name, String currency, String rate) throws Exception {
         MultiValueMap<String, String> params = new LinkedMultiValueMap<>();

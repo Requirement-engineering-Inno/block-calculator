@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<!-- Table of projects (calculations), shared by the production area page and the flat list. Needs "rows". Every row opens its project. -->
+<div th:fragment="table" class="table-wrap" th:if="${!rows.isEmpty()}">
+    <table id="calc-table" class="data">
+        <thead>
+        <tr>
+            <th th:text="#{calc.title}">Title</th>
+            <th class="col-hide-sm"><span th:text="#{calc.author}">Author</span></th>
+            <th class="col-hide-sm" th:text="#{calc.updated}">Updated</th>
+            <th class="num" th:if="${me.staff}"><span th:text="#{calc.total}">Total</span> <span th:replace="~{fragments :: tip(#{tip.col.total})}"></span></th>
+            <th class="num" th:unless="${me.staff}"><span th:text="#{calc.blocksTotal}">Blocks</span></th>
+            <th class="go"><span class="sr-only" th:text="#{common.open}">Open</span></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${rows}" th:classappend="${r.archived()} ? 'archived' : ''"
+            th:attr="data-calc-title=${r.title()},data-archived=${r.archived()},data-frozen=${r.frozen()},data-href=@{/calculations/{id}(id=${r.id()})}">
+            <td class="cell-title">
+                <a th:href="@{/calculations/{id}(id=${r.id()})}" th:text="${r.title()}">Walls</a>
+                <span class="badge frozen" th:if="${r.frozen()}" th:attr="data-tip=#{tip.badge.frozen}"><svg class="ic"><use href="#i-lock"/></svg><span th:text="#{calc.frozen}">Frozen</span></span>
+                <span class="badge archived" th:if="${r.archived()}" th:attr="data-tip=#{tip.badge.archived}"><svg class="ic"><use href="#i-archive"/></svg><span th:text="#{calc.archived}">Archived</span></span>
+                <small th:text="${r.projectSystem()} ? #{project.system} : ${r.project()}">Production area</small>
+            </td>
+            <td class="col-hide-sm"><span class="person"><span class="avatar sm" th:text="${#strings.substring(r.author(), 0, 1)}">A</span><span th:text="${r.author()}">Author</span></span></td>
+            <td class="col-hide-sm"><time th:datetime="${r.updatedAt()}" th:text="${@times.gmt(r.updatedAt())}">2026-11-17 10:00 GMT</time></td>
+            <td class="num" th:if="${me.staff}"><strong data-num th:text="${r.total()}">0</strong> <span class="sub" style="display:inline" th:text="${r.currency()}">RUB</span></td>
+            <td class="num" th:unless="${me.staff}"><strong data-num th:text="${r.blocks()}">0</strong></td>
+            <td class="go"><svg class="ic"><use href="#i-arrow"/></svg></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

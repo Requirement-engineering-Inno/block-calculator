@@ -1,53 +1,85 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<!-- Estimate card and material breakdown. Used on the calculation page and as the live preview (htmx). Needs model attribute "res". -->
+<!-- Estimate card and material breakdown. Used on the project page and as the live preview (htmx).
+     Needs model attributes "res" and "mix". Workers get quantities and proportions only: no price, cost or total is rendered for them. -->
 <div th:fragment="result" class="stack">
-    <section class="estimate">
+    <section class="estimate" th:if="${me.staff}">
         <div class="estimate-top"><h2 th:text="#{calc.estimate}">Production estimate</h2></div>
-        <div class="estimate-label" th:text="#{calc.totalCost}">Total material cost</div>
+        <div class="estimate-label"><span th:text="#{calc.totalCost}">Total material cost</span> <span th:replace="~{fragments :: tip(#{tip.result.total})}"></span></div>
         <div class="estimate-total"><span id="res-total" data-num th:text="${res.total().toPlainString()}">0</span><small id="res-currency" th:text="${res.currency()}">RUB</small></div>
         <div class="estimate-stats">
-            <div><span th:text="#{calc.blocksTotal}">Blocks</span><strong id="res-blocks" data-num th:text="${res.blocks().stripTrailingZeros().toPlainString()}">0</strong></div>
-            <div><span th:text="#{calc.batches}">Batches</span><strong id="res-batches" data-num th:text="${res.batches().stripTrailingZeros().toPlainString()}">0</strong></div>
-            <div><span th:text="#{calc.costPerBlock}">Cost per block</span><strong id="res-cost-per-block" data-num th:text="${res.costPerBlock().toPlainString()}">0</strong></div>
+            <div><span><span th:text="#{calc.blocksTotal}">Blocks</span> <span th:replace="~{fragments :: tip(#{tip.result.blocks})}"></span></span><strong id="res-blocks" data-num th:text="${res.blocks().stripTrailingZeros().toPlainString()}">0</strong></div>
+            <div><span><span th:text="#{calc.batches}">Batches</span> <span th:replace="~{fragments :: tip(#{tip.result.batches})}"></span></span><strong id="res-batches" data-num th:text="${res.batches().stripTrailingZeros().toPlainString()}">0</strong></div>
+            <div><span><span th:text="#{calc.costPerBlock}">Cost per block</span> <span th:replace="~{fragments :: tip(#{tip.result.perBlock})}"></span></span><strong id="res-cost-per-block" data-num th:text="${res.costPerBlock().toPlainString()}">0</strong></div>
         </div>
     </section>
+
+    <section class="estimate" th:unless="${me.staff}">
+        <div class="estimate-top"><h2 th:text="#{calc.materialsNeeded}">Materials needed</h2></div>
+        <div class="estimate-label"><span th:text="#{calc.blocksTotal}">Blocks</span> <span th:replace="~{fragments :: tip(#{tip.result.blocks})}"></span></div>
+        <div class="estimate-total"><span id="res-blocks" data-num th:text="${res.blocks().stripTrailingZeros().toPlainString()}">0</span></div>
+        <div class="estimate-stats">
+            <div><span><span th:text="#{calc.batches}">Batches</span> <span th:replace="~{fragments :: tip(#{tip.result.batches})}"></span></span><strong id="res-batches" data-num th:text="${res.batches().stripTrailingZeros().toPlainString()}">0</strong></div>
+            <div><span th:text="#{calc.batch}">Mix</span><strong th:text="${mix.number}">4</strong></div>
+            <div><span th:text="#{calc.strength}">Strength</span><strong th:text="#{calc.mpa(${mix.mpa})}">7.6 MPa</strong></div>
+        </div>
+    </section>
+
     <section class="card breakdown">
         <div class="card-head"><h2 th:text="#{calc.breakdown}">Material breakdown</h2></div>
         <div class="card-body table-wrap">
             <table>
                 <thead><tr>
                     <th th:text="#{calc.material}">Material</th>
-                    <th th:text="#{calc.quantity}">Quantity</th>
-                    <th class="num"><span th:text="#{calc.cost}">Cost</span>, <span th:text="${res.currency()}">RUB</span></th>
+                    <th><span th:text="#{calc.quantity}">Quantity</span> <span th:replace="~{fragments :: tip(#{tip.result.quantity})}"></span></th>
+                    <th class="num" th:if="${me.staff}"><span th:text="#{calc.cost}">Cost</span>, <span th:text="${res.currency()}">RUB</span></th>
                 </tr></thead>
                 <tbody>
                 <tr>
                     <td><span class="mat"><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><strong th:text="#{material.sand}">Sand</strong></span></td>
                     <td><strong><span id="res-sand-kg" data-num th:text="${res.sandKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-sand-barrows" data-num th:text="${res.sandBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
-                    <td class="num"><strong id="res-sand-cost" data-num th:text="${res.sandCost().toPlainString()}">0</strong></td>
+                    <td class="num" th:if="${me.staff}"><strong id="res-sand-cost" data-num th:text="${res.sandCost().toPlainString()}">0</strong></td>
                 </tr>
                 <tr>
                     <td><span class="mat"><img class="mat-ico" th:src="@{/img/stone.svg}" alt=""><strong th:text="#{material.stone}">Stone</strong></span></td>
                     <td><strong><span id="res-stone-kg" data-num th:text="${res.stoneKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-stone-barrows" data-num th:text="${res.stoneBarrows().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.barrows}">wheelbarrows</span></span></td>
-                    <td class="num"><strong id="res-stone-cost" data-num th:text="${res.stoneCost().toPlainString()}">0</strong></td>
+                    <td class="num" th:if="${me.staff}"><strong id="res-stone-cost" data-num th:text="${res.stoneCost().toPlainString()}">0</strong></td>
                 </tr>
                 <tr>
                     <td><span class="mat"><img class="mat-ico" th:src="@{/img/cement.svg}" alt=""><strong th:text="#{material.cement}">Cement</strong></span></td>
                     <td><strong><span id="res-cement-kg" data-num th:text="${res.cementKg().toPlainString()}">0</span> <span th:text="#{unit.kg}">kg</span></strong>
                         <span class="sub"><span id="res-cement-bags" data-num th:text="${res.cementBags().stripTrailingZeros().toPlainString()}">0</span> <span th:text="#{calc.bags}">bags of 50 kg</span></span></td>
-                    <td class="num"><strong id="res-cement-cost" data-num th:text="${res.cementCost().toPlainString()}">0</strong></td>
+                    <td class="num" th:if="${me.staff}"><strong id="res-cement-cost" data-num th:text="${res.cementCost().toPlainString()}">0</strong></td>
                 </tr>
                 </tbody>
             </table>
             <p class="note"><span th:text="#{calc.wsNote}">Wheelbarrow weight</span>: <span id="res-ws" data-num th:text="${res.ws().stripTrailingZeros().toPlainString()}">150</span> <span th:text="#{unit.kg}">kg</span>.
-                <span th:text="#{calc.excludes}">Estimates exclude labour, water, delivery and tax.</span></p>
+                <span th:if="${me.staff}" th:text="#{calc.excludes}">Estimates exclude labour, water, delivery and tax.</span></p>
         </div>
     </section>
 </div>
+
+<!-- Proportions of the chosen mix: parts per batch. Needs model attribute "mix". Shown to everybody. -->
+<section th:fragment="proportions" class="card" id="proportions">
+    <div class="card-head"><h2><span th:text="#{calc.proportions}">Proportions</span> <span th:replace="~{fragments :: tip(#{tip.result.proportions})}"></span></h2></div>
+    <div class="card-body">
+        <div class="mix-legend">
+            <span><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><span th:text="#{material.sand}">Sand</span></span>
+            <span><img class="mat-ico" th:src="@{/img/stone.svg}" alt=""><span th:text="#{material.stone}">Stone</span></span>
+            <span><img class="mat-ico" th:src="@{/img/cement.svg}" alt=""><span th:text="#{material.cement}">Cement</span></span>
+        </div>
+        <span class="mix-bar big">
+            <span class="seg sand" th:style="|flex-grow:${mix.sandBarrows}|" th:text="${mix.sandBarrows.stripTrailingZeros().toPlainString()}">2</span>
+            <span class="seg stone" th:if="${mix.stoneBarrows.signum() > 0}" th:style="|flex-grow:${mix.stoneBarrows}|" th:text="${mix.stoneBarrows.stripTrailingZeros().toPlainString()}">2</span>
+            <span class="seg cement" style="flex-grow:1">1</span>
+        </span>
+        <p class="mix-hint" th:text="#{calc.mix.hint(${mix.sandBarrows}, ${mix.stoneBarrows}, ${mix.yield})}">Recipe</p>
+    </div>
+</section>
+
 <div th:fragment="previewEmpty"></div>
 <div th:fragment="previewError" class="notice error" th:text="${previewMessage}">Invalid input</div>
 </body>

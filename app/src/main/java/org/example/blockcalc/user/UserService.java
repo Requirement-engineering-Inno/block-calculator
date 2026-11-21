@@ -154,6 +154,18 @@ public class UserService implements UserDetailsService {
                 .toList();
     }
 
+    public boolean isOnboardingDone(String userId) {
+        return get(userId).onboardingDone;
+    }
+
+    public void markOnboardingDone(String userId) {
+        UserAccount u = get(userId);
+        if (!u.onboardingDone) {
+            u.onboardingDone = true;
+            repo.save(u);
+        }
+    }
+
     public Map<String, UserAccount> byIds(Collection<String> ids) {
         Map<String, UserAccount> map = new HashMap<>();
         repo.findAllById(ids).forEach(u -> map.put(u.id, u));

@@ -17,4 +17,6 @@ public class UserAccount {
     public boolean active = true;
     public String createdBy;
     public Instant createdAt;
+    /** The welcome tour was finished or skipped once. */
+    public boolean onboardingDone;
 }

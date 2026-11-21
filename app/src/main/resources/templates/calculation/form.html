@@ -3,13 +3,13 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('calcs')}"></aside>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
 <div class="app-shell">
     <header th:replace="~{fragments :: topbar(${editing} ? #{calc.edit} : #{calc.new})}"></header>
     <main>
         <div class="page-head">
             <div>
-                <div class="eyebrow" th:text="${projectSystem} ? #{project.system} : ${projectName}">Project</div>
+                <div class="eyebrow"><a th:href="@{/projects/{id}(id=${f.projectId()})}" th:text="${projectSystem} ? #{project.system} : ${projectName}">Production area</a></div>
                 <h1 th:text="${editing} ? #{calc.edit} : #{calc.new}">New calculation</h1>
                 <p th:text="#{calc.form.subtitle}">Enter the blocks and the mix. The estimate updates as you type.</p>
             </div>
@@ -21,7 +21,7 @@
                     <div class="card-head"><h2 th:text="#{calc.section.details}">Production details</h2><span class="step" th:text="#{calc.step.input}">1 / Input</span></div>
                     <div class="card-body">
                         <div class="field" th:unless="${editing}">
-                            <label class="lbl" for="projectId" th:text="#{calc.project}">Project</label>
+                            <label class="lbl" for="projectId"><span th:text="#{calc.project}">Production area</span> <span th:replace="~{fragments :: tip(#{tip.form.area})}"></span></label>
                             <select id="projectId" name="projectId">
                                 <option th:each="p : ${projects}" th:value="${p.id}" th:selected="${p.id == f.projectId()}"
                                         th:text="${p.system} ? #{project.system} : ${p.name}">Project</option>
@@ -30,26 +30,26 @@
                         <input type="hidden" name="projectId" th:if="${editing}" th:value="${f.projectId()}">
 
                         <div class="field">
-                            <label class="lbl" for="title"><span th:text="#{calc.title}">Title</span> <span class="opt" th:text="#{common.optional}">(optional)</span></label>
+                            <label class="lbl" for="title"><span th:text="#{calc.title}">Title</span> <span class="opt" th:text="#{common.optional}">(optional)</span> <span th:replace="~{fragments :: tip(#{tip.form.title})}"></span></label>
                             <input id="title" type="text" name="title" maxlength="100" th:value="${f.title()}" th:placeholder="#{calc.title.placeholder}">
                         </div>
 
                         <div class="row2">
                             <div class="field">
-                                <label class="lbl" for="fullBlocks" th:text="#{calc.fullBlocks}">Full blocks</label>
+                                <label class="lbl" for="fullBlocks"><span th:text="#{calc.fullBlocks}">Full blocks</span> <span th:replace="~{fragments :: tip(#{tip.form.full})}"></span></label>
                                 <input id="fullBlocks" type="number" name="fullBlocks" min="0" max="10000000" step="1" inputmode="numeric" th:value="${f.fullBlocks()}" placeholder="0">
                             </div>
                             <div class="field">
-                                <label class="lbl" for="halfBlocks" th:text="#{calc.halfBlocks}">Half blocks</label>
+                                <label class="lbl" for="halfBlocks"><span th:text="#{calc.halfBlocks}">Half blocks</span> <span th:replace="~{fragments :: tip(#{tip.form.half})}"></span></label>
                                 <input id="halfBlocks" type="number" name="halfBlocks" min="0" max="10000000" step="1" inputmode="numeric" th:value="${f.halfBlocks()}" placeholder="0">
                             </div>
                         </div>
 
-                        <div class="section-title" th:text="#{calc.section.mix}">Mix</div>
+                        <div class="section-title"><span th:text="#{calc.section.mix}">Mix</span> <span th:replace="~{fragments :: tip(#{tip.form.mix})}"></span></div>
                         <fieldset>
                             <legend class="sr-only" th:text="#{calc.batch}">Batch</legend>
                             <div class="batch-options">
-                                <label class="batch-option" th:each="m : ${mixes}">
+                                <label class="batch-option" th:each="m : ${mixes}" th:attr="data-tip=#{calc.mix.hint(${m.sandBarrows}, ${m.stoneBarrows}, ${m.yield})}">
                                     <input type="radio" name="batch" th:value="${m.number}" th:checked="${m.number == f.batch()}">
                                     <strong th:text="#{calc.batch.short(${m.number})}">Batch 4</strong>
                                     <span th:text="#{calc.mpa(${m.mpa})}">7.6 MPa</span>
@@ -61,7 +61,7 @@
 
                         <div class="section-title" th:text="#{calc.section.options}">Options</div>
                         <div class="field">
-                            <label class="lbl" for="ws" th:text="#{calc.ws}">Wheelbarrow weight</label>
+                            <label class="lbl" for="ws"><span th:text="#{calc.ws}">Wheelbarrow weight</span> <span th:replace="~{fragments :: tip(#{tip.form.ws})}"></span></label>
                             <div class="input-group">
                                 <input id="ws" type="number" name="ws" min="1" max="10000" step="any" th:value="${f.ws()}" th:placeholder="${wsHint}">
                                 <span class="suffix" th:text="#{unit.kg}">kg</span>
@@ -71,11 +71,11 @@
                         <label class="switch">
                             <input type="checkbox" name="roundUp" th:checked="${f.roundUp()}">
                             <span class="track"></span>
-                            <span><strong th:text="#{calc.roundUp}">Round batches up</strong><small th:text="#{calc.roundUp.hint}">Plan whole batches only.</small></span>
+                            <span><strong><span th:text="#{calc.roundUp}">Round batches up</span> <span th:replace="~{fragments :: tip(#{tip.form.roundup})}"></span></strong><small th:text="#{calc.roundUp.hint}">Plan whole batches only.</small></span>
                         </label>
 
                         <div class="form-actions">
-                            <a class="btn ghost" th:href="${editing} ? @{/calculations/{id}(id=${f.id()})} : @{/calculations}" th:text="#{common.cancel}">Cancel</a>
+                            <a class="btn ghost" th:href="${editing} ? @{/calculations/{id}(id=${f.id()})} : @{/projects/{id}(id=${f.projectId()})}" th:text="#{common.cancel}">Cancel</a>
                             <button id="btn-save" type="submit" class="btn primary"><span th:text="#{calc.save}">Save calculation</span><svg class="ic"><use href="#i-check"/></svg></button>
                         </div>
                     </div>
@@ -83,7 +83,7 @@
 
                 <div class="stack">
                     <section class="card" id="mix-compare">
-                        <div class="card-head"><h2 th:text="#{calc.mixes.title}">Mixes compared</h2></div>
+                        <div class="card-head"><h2><span th:text="#{calc.mixes.title}">Mixes compared</span> <span th:replace="~{fragments :: tip(#{tip.mix.compare})}"></span></h2></div>
                         <div class="card-body">
                             <div class="mix-legend">
                                 <span><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><span th:text="#{material.sand}">Sand</span></span>

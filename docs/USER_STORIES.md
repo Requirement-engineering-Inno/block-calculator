@@ -381,3 +381,12 @@ As a manager, I want a new employee to receive an e-mail with the login, passwor
 - Default densities: sand 1600 kg/m³, crushed stone 1450 kg/m³; cement bag weight: 50 kg.
 - WS (wheelbarrow weight) is the same for sand and crushed stone.
 - Only a manager or admin can freeze and unfreeze a calculation. A frozen calculation cannot be edited.
+## US-21 Production areas hold the projects
+As a user I want every project to live inside its production area, so that it is clear which prices and team it uses.
+Settings (general values, users, my account) are one place; sharing levels are changed in the sharing list.
+
+## US-22 Workers see quantities, never money
+As a manager I want workers to see only the amounts of materials and the proportions of the mix.
+
+## US-23 Welcome tour
+As a new user I want a short tour on my first visit and a button to repeat it, plus hints next to the components.

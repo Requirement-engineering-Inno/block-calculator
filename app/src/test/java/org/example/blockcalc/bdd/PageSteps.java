@@ -51,7 +51,12 @@ public class PageSteps {
             "pdf", "#btn-pdf",
             "share", "#btn-share",
             "share all", "#btn-share-all",
-            "print", "#btn-print");
+            "print", "#btn-print",
+            "tour", "[data-tour-start]",
+            "new project", "#btn-new",
+            "area settings", "#btn-area-settings");
+
+    private static final String MONEY = "#res-total, #res-sand-cost, #res-stone-cost, #res-cement-cost, #res-cost-per-block, #res-currency";
 
     private static final Map<String, String> BADGES = Map.of(
             "frozen", "#badge-frozen",
@@ -59,6 +64,8 @@ public class PageSteps {
 
     @Autowired
     private World world;
+    @Autowired
+    private TestData data;
 
     // ---- HTTP ----------------------------------------------------------------------------
 
@@ -83,6 +90,12 @@ public class PageSteps {
     public void redirectedToCalculation() {
         assertNotNull(world.redirect(), "Expected a redirect but status was " + world.status());
         assertTrue(world.redirect().matches("/calculations/[0-9a-f]{24}"), "Unexpected redirect " + world.redirect());
+    }
+
+    @Then("I am redirected to the page of production area {string}")
+    public void redirectedToArea(String name) {
+        assertNotNull(world.redirect(), "Expected a redirect but status was " + world.status());
+        assertEquals("/projects/" + data.projectByName(name).id, world.redirect());
     }
 
     @Then("I see an error message")
@@ -116,6 +129,62 @@ public class PageSteps {
     @Then("the page does not contain {string}")
     public void pageDoesNotContain(String text) throws Exception {
         assertFalse(world.document().text().contains(text), "Page contains: " + text);
+    }
+
+    /** Workers see quantities and proportions only: no price, cost, total or currency anywhere on the page. */
+    @Then("the page shows no prices")
+    public void noPrices() throws Exception {
+        Document doc = world.document();
+        assertTrue(doc.select(MONEY).isEmpty(), "Money fields are on the page");
+        assertFalse(doc.text().contains("RUB"), "The currency is on the page");
+        assertFalse(doc.text().contains("Total material cost"), "The total cost is on the page");
+        assertFalse(doc.html().contains("data-currency"), "The currency is in the page markup");
+    }
+
+    @Then("the page shows prices")
+    public void showsPrices() throws Exception {
+        assertFalse(world.document().select("#res-total").isEmpty(), "No total on the page");
+    }
+
+    @Then("the proportions of the mix are shown")
+    public void proportions() throws Exception {
+        assertFalse(world.document().select("#proportions .mix-bar .seg").isEmpty(), "No proportions on the page");
+    }
+
+    @Then("the settings tabs are shown")
+    public void tabsShown() throws Exception {
+        assertFalse(world.document().select("nav.tabs").isEmpty(), "No settings tabs");
+    }
+
+    @Then("the settings tabs are not shown")
+    public void tabsHidden() throws Exception {
+        assertTrue(world.document().select("nav.tabs").isEmpty(), "Unexpected settings tabs");
+    }
+
+    @Then("the welcome tour starts by itself")
+    public void tourStarts() throws Exception {
+        assertTrue(tourScript().contains("auto: true"), "The tour does not start by itself");
+    }
+
+    @Then("the welcome tour does not start by itself")
+    public void tourDoesNotStart() throws Exception {
+        assertTrue(tourScript().contains("auto: false"), "The tour starts by itself");
+    }
+
+    @Then("the access level of {string} can be changed in the list")
+    public void accessMenu(String username) throws Exception {
+        String item = "#grants li[data-grant-user=\"" + username + "\"] details.menu ";
+        assertEquals(2, world.document().select(item + "button[name=level]").size(), "Two levels are offered");
+        assertEquals(1, world.document().select(item + "button[formaction]").size(), "Removing access is offered");
+    }
+
+    @Then("every row of the list opens its page")
+    public void rowsOpen() throws Exception {
+        Elements rows = world.document().select("table.data tbody tr");
+        assertFalse(rows.isEmpty(), "No rows");
+        for (Element r : rows) {
+            assertFalse(r.attr("data-href").isBlank(), "A row has no link: " + r.text());
+        }
     }
 
     @Then("the result shows:")
@@ -250,6 +319,14 @@ public class PageSteps {
         Element item = world.document().selectFirst("#grants li[data-grant-user=\"" + username + "\"]");
         assertNotNull(item, "No grant for " + username + " on the page");
         assertEquals(SetupSteps.level(level).name(), item.attr("data-level"));
+    }
+
+    private String tourScript() throws Exception {
+        StringBuilder all = new StringBuilder();
+        for (Element script : world.document().select("script")) {
+            all.append(script.data());
+        }
+        return all.toString();
     }
 
     private Element row(String title) throws Exception {

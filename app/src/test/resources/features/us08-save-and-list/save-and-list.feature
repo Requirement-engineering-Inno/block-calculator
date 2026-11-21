@@ -34,7 +34,7 @@ Feature: Save calculations and find them again
       | author     | ann   |
       | updated by | ann   |
 
-  Scenario: A calculation without a project goes to "Other calculations"
+  Scenario: A project without a production area goes to the built-in area
     Given I am logged in as "ann"
     When I create a calculation:
       | title | full | half | batch |

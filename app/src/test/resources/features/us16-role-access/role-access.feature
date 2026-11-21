@@ -17,7 +17,6 @@ Feature: Role based access
 
     Examples:
       | user  | path          | status |
-      | ann   | /projects     | 403    |
       | ann   | /projects/new | 403    |
       | ann   | /users        | 403    |
       | boss  | /projects     | 200    |
@@ -26,10 +25,20 @@ Feature: Role based access
       | admin | /projects     | 200    |
       | admin | /users        | 200    |
 
+  Scenario: Everybody who is signed in can open the production area list
+    Given I am logged in as "ann"
+    When I open "/projects"
+    Then the response status is 200
+
   Scenario: Everybody who is signed in can open the calculation list
     Given I am logged in as "ann"
     When I open the calculation list
     Then the response status is 200
+
+  Scenario: Management pages are closed for workers inside an area
+    Given I am logged in as "ann"
+    When I open the settings of production area "Alpha"
+    Then the response status is 403
 
   Scenario: Management pages are closed for anonymous users
     Given I am not logged in
@@ -48,4 +57,5 @@ Feature: Role based access
     Given I am logged in as "ann"
     When I open the calculation list
     Then the page does not contain "Users"
-    And the page does not contain "Projects"
+    And the page does not contain "New production area"
+    And the page does not contain "Currencies"

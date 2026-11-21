@@ -11,24 +11,24 @@ Feature: Switch the interface language
   Scenario: The interface is in English by default
     Given I am logged in as "ann"
     When I open the calculation list
-    Then the page contains "New calculation"
+    Then the page contains "New project"
 
   Scenario: A user switches to Russian
     Given I am logged in as "ann"
     When I switch the language to "ru"
-    Then the page contains "Новый расчёт"
+    Then the page contains "Новый проект"
 
   Scenario: The chosen language is remembered
     Given I am logged in as "ann"
     When I switch the language to "ru"
     And I open the calculation list
-    Then the page contains "Новый расчёт"
+    Then the page contains "Новый проект"
 
   Scenario: A user switches back to English
     Given I am logged in as "ann"
     When I switch the language to "ru"
     And I switch the language to "en"
-    Then the page contains "New calculation"
+    Then the page contains "New project"
 
   Scenario: The login page can be switched before signing in
     Given I am not logged in

@@ -100,7 +100,9 @@ public class CalculationController {
     @PostMapping("/preview")
     public String preview(@ModelAttribute CalcInput in, @AuthenticationPrincipal CurrentUser me, Model model, Locale locale) {
         try {
-            model.addAttribute("res", calcs.preview(me, in));
+            CalcResult res = calcs.preview(me, in);
+            model.addAttribute("res", res);
+            model.addAttribute("mix", Mix.of(res.batch()));
             return "calculation/result :: result";
         } catch (BusinessException e) {
             if ("error.calc.blocks".equals(e.getMessageKey())) {
@@ -117,6 +119,7 @@ public class CalculationController {
         CalcDetail d = calcs.detail(me, id);
         model.addAttribute("d", d);
         model.addAttribute("res", d.result());
+        model.addAttribute("mix", Mix.of(d.batch()));
         return "calculation/view";
     }
 
@@ -158,9 +161,9 @@ public class CalculationController {
 
     @PostMapping("/{id}/delete")
     public String delete(@PathVariable String id, @AuthenticationPrincipal CurrentUser me, RedirectAttributes ra) {
-        calcs.delete(me, id);
+        String areaId = calcs.delete(me, id);
         ra.addFlashAttribute("flash", "flash.calc.deleted");
-        return "redirect:/calculations";
+        return "redirect:/projects/" + areaId;
     }
 
     @PostMapping("/{id}/share")

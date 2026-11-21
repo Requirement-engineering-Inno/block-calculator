@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,8 @@ public class CalculationService {
         Project p = resolveProject(me, in.projectId());
         Calculation c = new Calculation();
         applyInput(c, in, p);
-        return CalculationEngine.calculate(c.fullBlocks, c.halfBlocks, Mix.of(c.batch), c.ws, c.roundUp, p.perKg());
+        CalcResult result = CalculationEngine.calculate(c.fullBlocks, c.halfBlocks, Mix.of(c.batch), c.ws, c.roundUp, p.perKg());
+        return me.isStaff() ? result : result.withoutMoney();
     }
 
     private Project resolveProject(CurrentUser me, String projectId) {
@@ -123,12 +125,14 @@ public class CalculationService {
         repo.save(c);
     }
 
-    public void delete(CurrentUser me, String id) {
+    /** @return the id of the production area the deleted project belonged to */
+    public String delete(CurrentUser me, String id) {
         Calculation c = load(me, id);
         if (!AccessPolicy.canDelete(me, c)) {
             throw new AccessDeniedException("Only managers delete calculations");
         }
         repo.delete(c);
+        return c.projectId;
     }
 
     /** Freezing stores the current project prices on the calculation; unfreezing drops them. */
@@ -232,10 +236,24 @@ public class CalculationService {
         for (Calculation c : list) {
             Project p = projectMap.get(c.projectId);
             CalcResult r = resultOf(c, p);
+            boolean money = me.isStaff();
             rows.add(new CalcRow(c.id, c.title, p.name, p.system, name(userMap, c.createdBy),
-                    c.updatedAt, c.archived, c.frozen, r.total().toPlainString(), r.currency()));
+                    c.updatedAt, c.archived, c.frozen,
+                    money ? r.total().toPlainString() : null, money ? r.currency() : null,
+                    r.blocks().stripTrailingZeros().toPlainString()));
         }
         return rows;
+    }
+
+    /** How many projects the user can open in every production area (area id -> count). */
+    public Map<String, Long> countsByArea(CurrentUser me) {
+        Map<String, Long> counts = new HashMap<>();
+        for (Calculation c : repo.findAll()) {
+            if (AccessPolicy.canView(me, c)) {
+                counts.merge(c.projectId, 1L, Long::sum);
+            }
+        }
+        return counts;
     }
 
     public CalcDetail detail(CurrentUser me, String id) {
@@ -251,15 +269,18 @@ public class CalculationService {
                 .map(g -> new GrantRow(g.userId, username(names, g.userId), name(names, g.userId), g.level))
                 .toList();
         boolean canShare = AccessPolicy.canShare(me, c);
+        boolean showMoney = me.isStaff();
+        CalcResult result = resultOf(c, p);
 
         return new CalcDetail(c.id, c.title, p.id, p.name, p.system, c.frozen, c.archived,
                 c.fullBlocks, c.halfBlocks, c.batch, c.ws, c.roundUp,
                 name(names, c.createdBy), c.createdAt,
                 name(names, c.updatedBy), c.updatedAt,
-                resultOf(c, p),
+                showMoney ? result : result.withoutMoney(),
                 AccessPolicy.canEdit(me, c), AccessPolicy.canWrite(me, c), canShare,
                 AccessPolicy.canDelete(me, c), AccessPolicy.canFreeze(me, c),
                 me.isStaff() && !p.system && !p.workerIds.isEmpty(),
+                showMoney,
                 grants);
     }
 

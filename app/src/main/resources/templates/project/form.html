@@ -3,14 +3,15 @@
 <head th:replace="~{fragments :: head}"></head>
 <body>
 <div th:replace="~{fragments :: icons}"></div>
-<aside th:replace="~{fragments :: sidebar('projects')}"></aside>
+<aside th:replace="~{fragments :: sidebar('areas')}"></aside>
 <div class="app-shell">
     <header th:replace="~{fragments :: topbar(${isNew} ? #{project.new} : #{project.settings})}"></header>
     <main>
         <div class="page-head">
             <div>
-                <div class="eyebrow"><a th:href="@{/projects}" th:text="#{project.back}">All projects</a></div>
-                <h1 th:text="${isNew} ? #{project.new} : (${p.system} ? #{project.system} : ${p.name})">Project</h1>
+                <div class="eyebrow"><a th:href="${isNew} ? @{/projects} : @{/projects/{id}(id=${p.id})}" th:text="${isNew} ? #{project.back} : (${p.system} ? #{project.system} : ${p.name})">All production areas</a></div>
+                <h1 th:text="${isNew} ? #{project.new} : #{project.settings}">Production area</h1>
+                <p th:if="${!isNew and !p.system}" th:text="${p.name}">Name</p>
                 <p th:if="${p.system}" th:text="#{project.system.hint}">Built in</p>
             </div>
         </div>
@@ -25,7 +26,7 @@
                             <input id="name" type="text" name="name" th:value="${p.name}" maxlength="100" required>
                         </div>
                         <div class="field">
-                            <label class="lbl" for="currency" th:text="#{project.currency}">Currency</label>
+                            <label class="lbl" for="currency"><span th:text="#{project.currency}">Currency</span> <span th:replace="~{fragments :: tip(#{tip.area.currency})}"></span></label>
                             <select id="currency" name="currency" required>
                                 <option th:each="c : ${currencies}" th:value="${c}" th:selected="${c == p.currency}" th:text="${c}">RUB</option>
                             </select>
@@ -36,7 +37,7 @@
                 </section>
 
                 <section class="card">
-                    <div class="card-head"><h2 th:text="#{project.section.prices}">Material prices</h2><span class="step" th:text="#{project.price.max(${1000000})}">Up to 1,000,000</span></div>
+                    <div class="card-head"><h2><span th:text="#{project.section.prices}">Material prices</span> <span th:replace="~{fragments :: tip(#{tip.area.prices.form})}"></span></h2><span class="step" th:text="#{project.price.max(${1000000})}">Up to 1,000,000</span></div>
                     <div class="card-body">
                         <div class="price-row">
                             <span class="name"><img class="mat-ico" th:src="@{/img/sand.svg}" alt=""><span th:text="#{material.sand}">Sand</span></span>
@@ -65,7 +66,7 @@
                 </section>
 
                 <section class="card" th:unless="${p.system}">
-                    <div class="card-head"><h2 th:text="#{project.section.workers}">Workers</h2></div>
+                    <div class="card-head"><h2><span th:text="#{project.section.workers}">Workers</span> <span th:replace="~{fragments :: tip(#{tip.area.workers})}"></span></h2></div>
                     <div class="card-body">
                         <p class="hint" style="margin:0 0 14px" th:text="#{project.workers.hint}">Only assigned workers can create calculations here.</p>
                         <div class="picker" data-picker data-mode="multi" data-field="workerIds" th:attr="data-url=@{/directory/workers}">
@@ -88,13 +89,13 @@
                 </section>
 
                 <div class="form-actions" style="margin:0">
-                    <a class="btn ghost" th:href="@{/projects}" th:text="#{common.cancel}">Cancel</a>
+                    <a class="btn ghost" th:href="${isNew} ? @{/projects} : @{/projects/{id}(id=${p.id})}" th:text="#{common.cancel}">Cancel</a>
                     <button id="btn-save-project" type="submit" class="btn primary"><span th:text="#{common.save}">Save</span><svg class="ic"><use href="#i-check"/></svg></button>
                 </div>
             </form>
 
             <section class="card" th:unless="${isNew}">
-                <div class="card-head"><h2 th:text="#{project.currency.change}">Change currency</h2></div>
+                <div class="card-head"><h2><span th:text="#{project.currency.change}">Change currency</span> <span th:replace="~{fragments :: tip(#{tip.area.currency.change})}"></span></h2></div>
                 <div class="card-body">
                     <p class="hint" style="margin:0 0 16px" th:text="#{project.currency.hint}">All prices are multiplied by the rate.</p>
                     <form th:action="@{/projects/{id}/currency(id=${p.id})}" method="post">
